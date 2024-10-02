@@ -1,0 +1,43 @@
+/* styles.css */
+.table-container {
+  height: calc(100vh - 182px); /* Thay đổi 100px thành chiều cao của header hoặc các phần tử khác nếu cần */
+  overflow-y: auto; /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao */
+}
+
+/* css work schedule */
+.classItem-weekday {
+  width: 100px;
+  padding-left: 1rem !important;
+}
+.classItem-session {
+  width: 115px;
+}
+.classItem-className {
+  width: 115px;
+  padding-left: 8px !important;
+}
+.classItem-level {
+  width: 75px;
+}
+.classItem-totalStudent {
+  width: 55px;
+  text-align: center;
+}
+.classItem-teacher {
+  width: 120px;
+}
+
+/* css student list */
+.stu-stt {
+  padding-left: 1rem !important;
+  width: 55px;
+  text-align: center;
+}
+.stu-birthday {
+  width: 110px;
+  text-align: center;
+}
+.stu-phone {
+  width: 115px;
+  text-align: center;
+}
