@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../css/table.css'; // Import Bootstrap CSS
 
 const WorkSchedule = () => {
   const [classes, setClasses] = useState([]); // State để lưu trữ danh sách lớp học
@@ -28,12 +27,14 @@ const WorkSchedule = () => {
     return classes.map((item) => {
       return item.classes.map((classItem, index) => (
         <tr key={index}>
-          {index === 0 && (
+          {/* {index === 0 && (
             <td className="classItem-weekday" rowSpan={item.classes.length}>{item.weekday}</td>
           )}
           {index === 0 && (
             <td rowSpan={item.classes.length}>{item.session}</td>
-          )}
+          )} */}
+          <td className="classItem-weekday">{item.weekday}</td>
+          <td>{item.session}</td>
           <td className="classItem-className">{classItem.className}</td>
           <td>{classItem.level}</td>
           <td className="classItem-totalStudent">{classItem.totalStudent}</td>
@@ -55,7 +56,7 @@ const WorkSchedule = () => {
         <div className="card-header">
           <h3 className="card-title">Lịch làm việc tuần 1/10</h3>
           <div className='card-tools'>
-          Số 25 Đinh Tất Miễn, p. Tân Thành, TP.Ninh Bình
+            Số 25 Đinh Tất Miễn, p. Tân Thành, TP.Ninh Bình
           </div>
         </div>
         <div className="card-body table-responsive p-0 table-container">

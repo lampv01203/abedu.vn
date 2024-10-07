@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { findUserByUserId } = require('../models/User');
+const secretKey = '$2a$10$mxcTqGR.pbKoaoabKQju/OL7JRLW.4S8mIGMUla43iEVtuS.hhSLO'; // Khóa bí mật để mã hóa và giải mã token
 
 const router = express.Router();
 
@@ -26,14 +27,52 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Sai mật khẩu' });
     }
 
+    // Lưu toàn bộ thông tin user vào session
+    req.session.user = {
+      user_id: user.user_id,
+      full_name: user.full_name,
+      email: user.email,
+      phone: user.phone,
+      department_id: user.department_id
+    };
     // Tạo token JWT
-    const token = jwt.sign({ id: user.userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.userId }, secretKey, { expiresIn: '1h' });
 
     // Phản hồi với token
-    res.json({ success: true, message: 'Đăng nhập thành công', token });
+    res.json({ success: true, message: 'Đăng nhập thành công', token, user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+});
+
+// Định nghĩa API logout
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Lỗi khi đăng xuất' });
+    }
+    res.json({ success: true, message: 'Đăng xuất thành công' });
+  });
+});
+
+router.post("/checkAuth", (req, res) => {
+  const { token } = req.body;
+  
+  if (!token) {
+    return res.status(401).json({ message: "Token không tồn tại" });
+  }
+
+  try {
+    // Xác thực token
+    const decoded = jwt.verify(token, secretKey);
+    
+
+    // Nếu xác thực thành công
+    res.status(200).json({ message: "Token hợp lệ", user: decoded });
+  } catch (error) {
+    // Token không hợp lệ hoặc hết hạn
+    res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
   }
 });
 

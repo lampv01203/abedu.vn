@@ -28,16 +28,37 @@
 }
 
 /* css student list */
-.stu-stt {
+.tb-stt {
   padding-left: 1rem !important;
   width: 55px;
   text-align: center;
 }
-.stu-birthday {
+.tb-110 {
+  width: 110px;
+}
+.tb-115 {
+  width: 115px;
+}
+
+.tb-100-per{
+  width: 100%;
+}
+.tb-center-110 {
   width: 110px;
   text-align: center;
 }
-.stu-phone {
+.tb-phone {
   width: 115px;
+  text-align: center;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+  box-shadow: none;
+}
+.tb-department {
+  width: 110px;
   text-align: center;
 }

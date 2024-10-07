@@ -21,3 +21,9 @@ body {
 .float-right {
   float: right !important;
 }
+
+a {
+  color: #007bff;
+  text-decoration: none;
+  background-color: transparent;
+}

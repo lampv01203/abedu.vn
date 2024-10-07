@@ -1,13 +1,13 @@
-const pool = require('../config/db');
+const db = require('../config/db');
 
 const Classes = {
     getAllClasses: async () => {
-      const [rows] = await pool.query(`
+      const [rows] = await db.query(`
         SELECT 
           c.weekday, 
           c.session, 
           c.class_name AS className, 
-          c.level, 
+          l.level_code, 
           c.teacher, 
           c.note, 
           COUNT(cs.student_id) AS totalStudent,
@@ -18,6 +18,8 @@ const Classes = {
           class_students cs ON c.class_id = cs.class_id
         LEFT JOIN 
           students s ON cs.student_id = s.student_id
+        LEFT JOIN 
+          level l ON c.level_id = l.level_id
         GROUP BY 
           c.class_id
         ORDER BY 
