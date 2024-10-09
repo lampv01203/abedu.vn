@@ -3,7 +3,10 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 const withAdmin = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
-
+  if (loading) {
+    // Có thể hiển thị một loader ở đây nếu cần
+    return <div>Loading...</div>;
+  }
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }

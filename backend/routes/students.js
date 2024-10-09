@@ -1,64 +1,157 @@
-// backend/routes/students.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../config/db');
-const checkAuth = require('./auth'); // Import hàm checkAuth từ auth.js
+const Student = require("../models/Student");
+const Department = require("../models/Department");
+const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 
-router.get('/getStudents', checkAuth, async (req, res) => {
+// Route để lấy danh sách học sinh
+router.get("/getStudents", checkAuth, async (req, res) => {
   try {
-    // Lấy thông tin user từ session
     const user = req.session.user;
-    if (!user) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
 
-    let query = `
-      SELECT 
-        s.student_id,
-        s.full_name, 
-        s.birthday, 
-        s.phone, 
-        s.facebook, 
-        d.department_code,
-        s.note 
-      FROM students s
-      LEFT JOIN department d
-      ON s.department_id = d.department_id
-    `;
-    let params = [];
+    // Tạo điều kiện tìm kiếm theo department_id nếu user.department_id không phải là 1
+    const whereClause =
+      user.department_id !== 1 ? { department_id: user.department_id } : {};
 
-    if (user.department_id !== 1) {
-      query += ' WHERE s.department_id = ?';
-      params.push(user.department_id);
-    }
+    const students = await Student.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Department,
+          attributes: ["department_code"], // Chọn trường cần thiết từ bảng Department
+        },
+      ],
+    });
 
-    query += ' ORDER BY full_name'; // Thêm điều kiện sắp xếp theo full_name
-
-    const [students] = await db.query(query, params);
     res.json(students);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Lỗi khi lấy danh sách học sinh:", error);
+    res
+      .status(500)
+      .json({ message: "Đã xảy ra lỗi khi lấy danh sách học sinh" });
   }
 });
 
-// Route để thêm sinh viên
-router.post('/addStudents', checkAuth, async (req, res) => {
-  const { full_name, birthday, phone, facebook, department_id, note } = req.body;
-
-  const query = `
-    INSERT INTO students (full_name, birthday, phone, facebook, department_id, note)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-  
-  const params = [full_name, birthday, phone, facebook, department_id, note];
-
+// Route để thêm học sinh mới
+router.post("/addStudent", checkAuth, async (req, res) => {
   try {
-    const [result] = await db.query(query, params);
-    res.status(201).json({ success: true, message: 'Thêm sinh viên thành công', student_id: result.insertId });
+    const { full_name, birthday, phone, facebook, department_id, note } =
+      req.body;
+
+    // Kiểm tra các trường bắt buộc
+    if (!full_name) {
+      return res.status(400).json({ message: "Thiếu thông tin bắt buộc" });
+    }
+
+    // Kiểm tra xem học sinh đã tồn tại hay chưa
+    const existingStudent = await Student.findOne({
+      where: {
+        full_name,
+        birthday,
+        phone,
+        del_flg: 0, // Kiểm tra chỉ với những giáo viên chưa bị xóa
+      },
+    });
+
+    if (existingStudent) {
+      return res.status(400).json({
+        message: `Học sinh ${full_name} đã được đăng ký`,
+      });
+    }
+
+    const student = await Student.create({
+      full_name,
+      birthday,
+      phone,
+      facebook,
+      department_id,
+      note,
+    });
+
+    res.status(201).json({
+      message: "Học sinh đã được thêm thành công",
+      student_id: student.student_id,
+    });
   } catch (error) {
-    console.error('Lỗi khi thêm sinh viên:', error);
-    res.status(500).json({ success: false, message: 'Lỗi khi thêm sinh viên' });
+    console.error("Lỗi thêm học sinh:", error);
+    res.status(500).json({ message: "Đã xảy ra lỗi khi thêm học sinh" });
+  }
+});
+
+// Route để lấy thông tin học sinh theo ID
+router.get("/getStudent/:id", checkAuth, async (req, res) => {
+  try {
+    const student = await Student.findByPk(req.params.id, {
+      include: [
+        {
+          model: Department,
+          attributes: ["department_code"],
+        },
+      ],
+    });
+
+    if (!student) return res.status(404).send("Học sinh không tồn tại.");
+    res.json(student);
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin học sinh:", error);
+    res.status(500).send("Lỗi server.");
+  }
+});
+
+// Route để cập nhật thông tin học sinh
+router.put("/updateStudent/:id", checkAuth, async (req, res) => {
+  try {
+    const { full_name, birthday, phone, facebook, department_id, note } =
+      req.body;
+
+    const studentData = req.body; // Nhận object student từ frontend
+    const studentId = req.params.id;
+
+    // Kiểm tra xem học sinh có tồn tại không
+    const existingStudent = await Student.findByPk(studentId);
+    if (!existingStudent) {
+      return res.status(404).send("Học sinh không tồn tại.");
+    }
+
+    // Kiểm tra xem có học sinh nào khác trùng thông tin không
+    const duplicateStudent = await Student.findOne({
+      where: {
+        full_name: studentData.full_name,
+        birthday: studentData.birthday,
+        phone: studentData.phone,
+        student_id: { [Op.ne]: studentId }, // Không tính học sinh hiện tại
+      },
+    });
+
+    if (duplicateStudent) {
+      return res.status(400).json({
+        message: `Học sinh ${studentData.full_name} đã bị cập nhầm trùng thông tin với học sinh khác`,
+      });
+    }
+    // Cập nhật thông tin học sinh
+    await existingStudent.update(studentData);
+
+    res.status(200).json({ message: "Cập nhật thông tin học sinh thành công" });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật học sinh:", error);
+    res.status(500).send("Lỗi server.");
+  }
+});
+// Route để xóa học sinh
+router.delete("/deleteStudent/:id", checkAuth, async (req, res) => {
+  try {
+    const student = await Student.findByPk(req.params.id);
+
+    if (!student)
+      return res.status(404).json({ message: "Học sinh không tồn tại" });
+
+    // Đánh dấu học sinh là đã xóa
+    await student.update({ del_flg: 1 }); // Đánh dấu trường del_flg là 1
+
+    res.status(200).json({ message: "Học sinh đã bị xóa" });
+  } catch (error) {
+    console.error("Lỗi khi xóa học sinh", error);
+    res.status(500).json({ message: "Lỗi server" });
   }
 });
 

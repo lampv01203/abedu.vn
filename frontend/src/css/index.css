@@ -27,3 +27,32 @@ a {
   text-decoration: none;
   background-color: transparent;
 }
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+  background-color: #f5f5f5; /* Màu nền nhẹ nhàng */
+}
+
+.spinner {
+  border: 8px solid #f3f3f3; /* Màu nền của spinner */
+  border-top: 8px solid #3498db; /* Màu của phần quay */
+  border-radius: 50%;
+  width: 60px; /* Kích thước của spinner */
+  height: 60px;
+  animation: spin 1s linear infinite; /* Chuyển động quay */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 20px; /* Khoảng cách giữa spinner và chữ "Đang tải..." */
+  font-size: 18px; /* Kích thước chữ */
+  color: #555; /* Màu chữ */
+}

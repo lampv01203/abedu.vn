@@ -1,39 +1,39 @@
-const db = require("../config/db");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/sequelize"); // Kết nối cơ sở dữ liệu
 
-const Level = {
-  findByPk: async (level_id) => {
-    const [rows] = await db.query("SELECT * FROM level WHERE level_id = ?", [
-      level_id,
-    ]);
-    return rows[0]; // Trả về người dùng đầu tiên nếu có
+const Level = sequelize.define("Level", {
+  level_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  updateByPk: async (levelData) => {
-    try {
-      const query = `
-        UPDATE level 
-        SET 
-          level_code = ?, 
-          description = ?, 
-          session_number = ?, 
-          course_fees = ?, 
-          note = ?
-        WHERE level_id = ?
-      `;
-      const updateParams = [
-        levelData.level_code, 
-        levelData.description, 
-        levelData.session_number, 
-        levelData.course_fees, 
-        levelData.note, 
-        levelData.level_id
-      ];
-      const [result] = await db.query(query, updateParams);
-      return result.affectedRows > 0; // Trả về true nếu cập nhật thành công
-    } catch (error) {
-      console.error("Lỗi khi cập nhật cấp độ", error);
-      res.status(500).send("Lỗi server.");
-    }
+  level_code: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-};
+  description: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  session_number: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  course_fees: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  note: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  del_flg: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false, // Cờ đánh dấu xóa
+  },
+}, {
+  tableName: "level", // Tên table trong database
+  timestamps: false,  // Không tự động thêm createdAt, updatedAt
+});
 
 module.exports = Level;

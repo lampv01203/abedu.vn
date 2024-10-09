@@ -12,7 +12,6 @@ const EditLevel = () => {
     session_number: "",
     course_fees: "",
     note: "",
-    level_id: id,
   });
 
   // Lấy thông tin cấp độ từ API
@@ -59,6 +58,7 @@ const EditLevel = () => {
             <label htmlFor="levelCode">Mã cấp độ</label>
             <input
               type="text"
+              disabled
               className="form-control"
               id="levelCode"
               name="level_code"

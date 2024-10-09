@@ -63,7 +63,13 @@ const StudentList = () => {
     return filteredStudents.map((student, index) => (
       <tr key={student.student_id}>
         <td className="tb-stt">{index + 1}</td>
-        <td>{student.full_name}</td>
+        <td>
+          <Link
+            to={`/editStudent/${student.student_id}`}
+            className="text-primary">
+            {student.full_name}
+          </Link>
+        </td>
         <td className="tb-center-110">{student.birthday}</td>
         <td className="tb-phone">{student.phone}</td>
         <td>{student.facebook}</td>

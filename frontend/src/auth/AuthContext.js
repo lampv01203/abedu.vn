@@ -16,11 +16,7 @@ const AuthProvider = ({ children }) => {
       } else {
         try {
           const response = await axios.post("/api/checkAuth", { token });
-          if (response.status === 200) {
-            setIsAuthenticated(true); // Token hợp lệ
-          } else {
-            setIsAuthenticated(false); // Token không hợp lệ
-          }
+          setIsAuthenticated(response.status === 200); // Token hợp lệ
         } catch (error) {
           console.error("Error verifying token:", error);
           setIsAuthenticated(false); // Lỗi khi xác thực
