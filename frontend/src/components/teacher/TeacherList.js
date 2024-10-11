@@ -19,8 +19,12 @@ const TeacherList = () => {
   useEffect(() => {
     axios.get('/api/getTeachers')
       .then(response => {
-        setTeachers(response.data);
-        setFilteredTeachers(response.data);
+        const teacherData = response.data.map((teacher) => ({
+          ...teacher,
+          department_code: teacher.Department?.department_code,
+        }));
+        setTeachers(teacherData);
+        setFilteredTeachers(teacherData);
       })
       .catch(error => {
         // if (error.response && error.response.status === 401) {
@@ -56,12 +60,12 @@ const TeacherList = () => {
   const renderRows = () => {
     return filteredTeachers.map((teacher, index) => (
       <tr key={teacher.teacher_id}>
-        <td className='tb-stt'>{index + 1}</td>
+        <td className='w-stt'>{index + 1}</td>
         <td>{teacher.full_name}</td>
-        <td className='tb-center-110'>{teacher.birthday}</td>
-        <td className='tb-phone'>{teacher.phone}</td>
+        <td className='w-center-110'>{teacher.birthday}</td>
+        <td className='w-phone'>{teacher.phone}</td>
         <td>{teacher.facebook}</td>
-        <td className='tb-center-110'>{teacher.department_code}</td>
+        <td className='w-center-110'>{teacher.department_code}</td>
         <td>{teacher.address}</td>
         <td>{teacher.note}</td>
       </tr>
@@ -84,10 +88,11 @@ const TeacherList = () => {
         <table className="table table-head-fixed table-bordered table-hover">
           <thead>
             <tr>
-              <th className='tb-stt'></th>
+              <th></th>
               <th>
                 Họ và tên
                 <input
+                  className="w-150"
                   type="text"
                   name="fullName"
                   value={filters.fullName}
@@ -95,10 +100,10 @@ const TeacherList = () => {
                   placeholder="Lọc theo tên"
                 />
               </th>
-              <th className='tb-center-110'>
+              <th>
                 Năm sinh
                 <input
-                  className='tb-110'
+                  className='w-110'
                   type="text"
                   name="birthday"
                   value={filters.birthday}
@@ -106,10 +111,10 @@ const TeacherList = () => {
                   placeholder="Lọc theo năm"
                 />
               </th>
-              <th className='tb-phone'>
+              <th>
                 Sdt
                 <input
-                  className='tb-phone'
+                  className='w-110'
                   type="text"
                   name="phone"
                   value={filters.phone}
@@ -120,7 +125,7 @@ const TeacherList = () => {
               <th>
                 Facebook
                 <input
-                  className='tb-110'
+                  className='w-150'
                   type="text"
                   name="facebook"
                   value={filters.facebook}
@@ -128,15 +133,15 @@ const TeacherList = () => {
                   placeholder="Lọc theo FB"
                 />
               </th>
-              <th className='tb-center-110'>
+              <th>
                 Cơ sở
                 <input
-                  className='tb-110'
+                  className='w-80'
                   type="text"
                   name="department_code"
                   value={filters.department_code}
                   onChange={handleFilterChange}
-                  placeholder="Lọc theo cơ sở"
+                  placeholder="Lọc cơ sở"
                 />
               </th>
               <th>

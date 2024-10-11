@@ -67,15 +67,15 @@ const LevelList = () => {
   const renderRows = () => {
     return filteredLevels.map((Level, index) => (
       <tr key={Level.level_id}>
-        <td className="tb-stt">{index + 1}</td>
+        <td className="w-stt">{index + 1}</td>
         <td>
           <Link to={`/editLevel/${Level.level_id}`} className="text-primary">
             {Level.level_code}
           </Link>
         </td>
         <td>{Level.description}</td>
-        <td className="tb-center-110">{Level.session_number}</td>
-        <td className="tb-center-110">
+        <td className="w-center-110">{Level.session_number}</td>
+        <td className="w-center-110">
           <NumericFormat
             value={Level.course_fees}
             displayType={"text"} // Sử dụng 'text' để không cho phép chỉnh sửa
@@ -110,11 +110,11 @@ const LevelList = () => {
         <table className="table table-head-fixed table-bordered table-hover">
           <thead>
             <tr>
-              <th className="tb-stt"></th>
-              <th className="tb-110">
+              <th className="w-stt"></th>
+              <th className="w-110">
                 Mã cấp độ
                 <input
-                  className="tb-110"
+                  className="w-110"
                   type="text"
                   name="level_code"
                   value={filters.level_code}
@@ -122,7 +122,7 @@ const LevelList = () => {
                   placeholder="Lọc theo mã"
                 />
               </th>
-              <th className="tb-115">
+              <th className="w-115">
                 Tên cấp độ
                 <input
                   type="text"
@@ -132,10 +132,10 @@ const LevelList = () => {
                   placeholder="Lọc theo tên"
                 />
               </th>
-              <th className="tb-center-110">
+              <th className="w-center-110">
                 Số buổi học
                 <input
-                  className="tb-center-110"
+                  className="w-center-110"
                   type="text"
                   name="session_number"
                   value={filters.session_number}
@@ -143,10 +143,10 @@ const LevelList = () => {
                   placeholder="Lọc số buổi"
                 />
               </th>
-              <th className="tb-center-110">
+              <th className="w-center-110">
                 Học phí
                 <NumericFormat
-                  className="tb-center-110"
+                  className="w-center-110"
                   type="text"
                   name="course_fees"
                   value={filters.course_fees}
@@ -165,7 +165,7 @@ const LevelList = () => {
               <th>
                 Note
                 <input
-                  className="tb-100-per"
+                  className="w-100-per"
                   type="text"
                   name="note"
                   value={filters.note}

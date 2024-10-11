@@ -1,7 +1,9 @@
 /* styles.css */
 .table-container {
-  height: calc(100vh - 182px); /* Thay đổi 100px thành chiều cao của header hoặc các phần tử khác nếu cần */
-  overflow-y: auto; /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao */
+  height: calc(100vh - 182px);
+  /* Thay đổi 100px thành chiều cao của header hoặc các phần tử khác nếu cần */
+  overflow-y: auto;
+  /* Thêm thanh cuộn nếu nội dung vượt quá chiều cao */
 }
 
 /* css work schedule */
@@ -9,47 +11,46 @@
   width: 100px;
   padding-left: 1rem !important;
 }
+
 .classItem-session {
   width: 115px;
 }
+
 .classItem-className {
   width: 115px;
   padding-left: 8px !important;
 }
+
 .classItem-level {
   width: 75px;
 }
+
 .classItem-totalStudent {
   width: 55px;
   text-align: center;
 }
+
 .classItem-teacher {
   width: 120px;
 }
 
 /* css student list */
-.tb-stt {
+.w-stt {
   padding-left: 1rem !important;
   width: 55px;
   text-align: center;
 }
-.tb-110 {
-  width: 110px;
-}
-.tb-115 {
-  width: 115px;
+
+.w-1rem {
+  padding-left: 1rem !important;
 }
 
-.tb-100-per{
+.w-center {
+  text-align: center;
+}
+
+.w-100per {
   width: 100%;
-}
-.tb-center-110 {
-  width: 110px;
-  text-align: center;
-}
-.tb-phone {
-  width: 115px;
-  text-align: center;
 }
 
 .btn-primary {
@@ -58,7 +59,8 @@
   border-color: #007bff;
   box-shadow: none;
 }
-.tb-department {
+
+.w-department {
   width: 110px;
   text-align: center;
 }

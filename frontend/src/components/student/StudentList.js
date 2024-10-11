@@ -10,7 +10,7 @@ const StudentList = () => {
     birthday: "",
     phone: "",
     facebook: "",
-    departmentCode: "",
+    department_code: "",
     note: "",
   });
 
@@ -19,8 +19,12 @@ const StudentList = () => {
     axios
       .get("/api/getStudents")
       .then((response) => {
-        setStudents(response.data);
-        setFilteredStudents(response.data);
+        const studentData = response.data.map((student) => ({
+          ...student,
+          department_code: student.Department?.department_code,
+        }));
+        setStudents(studentData);
+        setFilteredStudents(studentData);
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
@@ -44,7 +48,7 @@ const StudentList = () => {
           .includes(filters.facebook.toLowerCase()) &&
         (student.department_code || "")
           .toLowerCase()
-          .includes(filters.departmentCode.toLowerCase()) &&
+          .includes(filters.department_code.toLowerCase()) &&
         (student.note || "").toLowerCase().includes(filters.note.toLowerCase())
     );
     setFilteredStudents(filtered);
@@ -62,18 +66,19 @@ const StudentList = () => {
   const renderRows = () => {
     return filteredStudents.map((student, index) => (
       <tr key={student.student_id}>
-        <td className="tb-stt">{index + 1}</td>
+        <td className="w-stt">{index + 1}</td>
         <td>
           <Link
             to={`/editStudent/${student.student_id}`}
-            className="text-primary">
+            className="text-primary"
+          >
             {student.full_name}
           </Link>
         </td>
-        <td className="tb-center-110">{student.birthday}</td>
-        <td className="tb-phone">{student.phone}</td>
+        <td className="w-center-110">{student.birthday}</td>
+        <td className="w-phone">{student.phone}</td>
         <td>{student.facebook}</td>
-        <td className="tb-center-110">{student.department_code}</td>
+        <td className="w-center-110">{student.department_code}</td>
         <td>{student.note}</td>
       </tr>
     ));
@@ -100,11 +105,11 @@ const StudentList = () => {
         <table className="table table-head-fixed table-bordered table-hover">
           <thead>
             <tr>
-              <th className="tb-stt"></th>
+              <th className="w-stt"></th>
               <th>
                 Họ và tên
                 <input
-                  className="tb-100-per"
+                  className="w-100-per"
                   type="text"
                   name="fullName"
                   value={filters.fullName}
@@ -112,10 +117,10 @@ const StudentList = () => {
                   placeholder="Lọc theo tên"
                 />
               </th>
-              <th className="tb-center-110">
+              <th className="w-center-110">
                 Năm sinh
                 <input
-                  className="tb-110"
+                  className="w-110"
                   type="text"
                   name="birthday"
                   value={filters.birthday}
@@ -123,10 +128,10 @@ const StudentList = () => {
                   placeholder="Lọc theo năm"
                 />
               </th>
-              <th className="tb-center-110">
+              <th className="w-center-110">
                 Sdt
                 <input
-                  className="tb-110"
+                  className="w-110"
                   type="text"
                   name="phone"
                   value={filters.phone}
@@ -137,7 +142,7 @@ const StudentList = () => {
               <th>
                 Facebook
                 <input
-                  className="tb-100-per"
+                  className="w-100-per"
                   type="text"
                   name="facebook"
                   value={filters.facebook}
@@ -145,10 +150,10 @@ const StudentList = () => {
                   placeholder="Lọc theo Facebook"
                 />
               </th>
-              <th className="tb-center-110">
+              <th className="w-center-110">
                 Cơ sở
                 <input
-                  className="tb-115"
+                  className="w-115"
                   type="text"
                   name="departmentCode"
                   value={filters.departmentCode}
@@ -159,7 +164,7 @@ const StudentList = () => {
               <th>
                 Note
                 <input
-                  className="tb-100-per"
+                  className="w-100-per"
                   type="text"
                   name="note"
                   value={filters.note}

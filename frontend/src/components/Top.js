@@ -9,6 +9,7 @@ import "overlayscrollbars";
 import "apexcharts";
 import "admin-lte/dist/js/adminlte.js"; // Import AdminLTE JS
 import '../css/table.css'; // Import Bootstrap CSS
+import '../css/table.scss'; // Import Bootstrap CSS
 
 const TopScreen = () => {
   const navigate = useNavigate();
@@ -164,6 +165,15 @@ const TopScreen = () => {
                   <i className="nav-icon fa-solid fa-users"></i>
                   <p>
                     Danh sách học sinh
+                    <i className="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/classlist" className="nav-link">
+                  <i className="nav-icon fa-solid fa-users"></i>
+                  <p>
+                    Danh sách lớp học
                     <i className="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </Link>

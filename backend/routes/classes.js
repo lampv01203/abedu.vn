@@ -30,10 +30,6 @@ router.get("/getClasses", checkAuth, async (req, res) => {
           model: Level,
           attributes: ["level_code"], // Lấy level_code từ bảng Level
         },
-        {
-          model: Teacher,
-          attributes: ["full_name"], // Lấy full_name từ bảng Teacher
-        },
       ],
     });
 

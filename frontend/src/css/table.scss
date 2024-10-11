@@ -1,0 +1,19 @@
+@mixin width-generator($start, $end, $step) {
+    @for $i from $start through $end {
+      .w-#{$i} {
+        width: #{$i}px;
+      }
+    }
+  }
+  
+  @include width-generator(50, 200, 5);
+
+  @mixin height-generator($start, $end, $step) {
+    @for $i from $start through $end {
+      .h-#{$i} {
+        height: #{$i}px;
+      }
+    }
+  }
+  
+  @include height-generator(10, 200, 5);

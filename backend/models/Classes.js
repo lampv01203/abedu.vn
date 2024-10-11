@@ -1,6 +1,8 @@
 // backend/models/Class.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
+const Level = require("./Level");
+const Department = require("./Department");
 
 const Class = sequelize.define('Class', {
   class_id: {
@@ -28,10 +30,6 @@ const Class = sequelize.define('Class', {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
-  teacher: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
-  },
   note: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -44,9 +42,17 @@ const Class = sequelize.define('Class', {
     type: DataTypes.TINYINT,
     defaultValue: 0, // 0 cho chưa xóa, 1 cho đã xóa
   },
+  graduated_flg: {
+    type: DataTypes.TINYINT,
+    defaultValue: 0, // 0 cho chưa xóa, 1 cho đã xóa
+  },
 }, {
   tableName: 'classes',
   timestamps: false,
 });
 
+// Thiết lập mối quan hệ
+Class.belongsTo(Department, { foreignKey: 'department_id' }); 
+// Thiết lập mối quan hệ
+Class.belongsTo(Level, { foreignKey: 'Level_id' }); 
 module.exports = Class;
