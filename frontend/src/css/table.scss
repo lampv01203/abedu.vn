@@ -6,7 +6,7 @@
     }
   }
   
-  @include width-generator(50, 200, 5);
+  @include width-generator(50, 800, 5);
 
   @mixin height-generator($start, $end, $step) {
     @for $i from $start through $end {
@@ -16,4 +16,4 @@
     }
   }
   
-  @include height-generator(10, 200, 5);
+  @include height-generator(10, 500, 5);

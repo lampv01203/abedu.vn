@@ -1,10 +1,35 @@
 // backend/routes/teachers.js
 const express = require("express");
 const router = express.Router();
-const db = require("../config/db");
 const Teacher = require("../models/Teacher"); // Import mô hình Teacher
 const Department = require("../models/Department"); // Import mô hình Department
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
+const { Op } = require("sequelize");
+
+router.get("/teachers", checkAuth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    const query = {
+      del_flg: 0, // Lọc chỉ lấy giáo viên chưa bị xóa
+    };
+
+    // Nếu department_id của user khác 1, thêm điều kiện lọc department_id
+    if (user.department_id !== 1) {
+      query.department_id = user.department_id;
+    }
+
+    // Lấy danh sách giáo viên với LEFT JOIN Department để lấy department_code
+    const teachers = await Teacher.findAll({
+      attributes: ["teacher_id", "full_name"],
+      where: query
+    });
+
+    res.json(teachers);
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách giáo viên", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 router.get("/getTeachers", checkAuth, async (req, res) => {
   try {

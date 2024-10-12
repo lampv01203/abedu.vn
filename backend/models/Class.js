@@ -18,23 +18,15 @@ const Class = sequelize.define('Class', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  weekday: {
-    type: DataTypes.STRING(50),
-    allowNull: false,
-  },
-  session: {
-    type: DataTypes.STRING(100),
-    allowNull: false,
-  },
   class_name: {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
-  note: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
   start_date: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  end_date: {
     type: DataTypes.DATE,
     allowNull: false,
   },
@@ -42,12 +34,16 @@ const Class = sequelize.define('Class', {
     type: DataTypes.TINYINT,
     defaultValue: 0, // 0 cho chưa xóa, 1 cho đã xóa
   },
+  note: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   graduated_flg: {
     type: DataTypes.TINYINT,
     defaultValue: 0, // 0 cho chưa xóa, 1 cho đã xóa
   },
 }, {
-  tableName: 'classes',
+  tableName: 'class',
   timestamps: false,
 });
 

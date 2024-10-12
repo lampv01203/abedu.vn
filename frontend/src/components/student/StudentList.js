@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { format } from "date-fns";
 
 const StudentList = () => {
   const [students, setStudents] = useState([]); // Dữ liệu sinh viên
@@ -68,17 +69,16 @@ const StudentList = () => {
       <tr key={student.student_id}>
         <td className="w-stt">{index + 1}</td>
         <td>
-          <Link
-            to={`/editStudent/${student.student_id}`}
-            className="text-primary"
-          >
+          <Link to={`/editstudent/${student.student_id}`} className="text-primary">
             {student.full_name}
           </Link>
         </td>
-        <td className="w-center-110">{student.birthday}</td>
-        <td className="w-phone">{student.phone}</td>
+        <td className="w-center">
+          {format(new Date(student.birthday), "dd/MM/yyyy")}
+        </td>
+        <td className="w-center">{student.phone}</td>
         <td>{student.facebook}</td>
-        <td className="w-center-110">{student.department_code}</td>
+        <td className="w-center">{student.department_code}</td>
         <td>{student.note}</td>
       </tr>
     ));
@@ -106,10 +106,10 @@ const StudentList = () => {
           <thead>
             <tr>
               <th className="w-stt"></th>
-              <th>
+              <th className="w-180">
                 Họ và tên
                 <input
-                  className="w-100-per"
+                  className="w-100-per w-180"
                   type="text"
                   name="fullName"
                   value={filters.fullName}
@@ -117,10 +117,10 @@ const StudentList = () => {
                   placeholder="Lọc theo tên"
                 />
               </th>
-              <th className="w-center-110">
+              <th className="w-110">
                 Năm sinh
                 <input
-                  className="w-110"
+                  className="w-center w-110"
                   type="text"
                   name="birthday"
                   value={filters.birthday}
@@ -128,10 +128,10 @@ const StudentList = () => {
                   placeholder="Lọc theo năm"
                 />
               </th>
-              <th className="w-center-110">
+              <th className="w-110">
                 Sdt
                 <input
-                  className="w-110"
+                  className="w-center w-110"
                   type="text"
                   name="phone"
                   value={filters.phone}
@@ -139,10 +139,10 @@ const StudentList = () => {
                   placeholder="Lọc theo SĐT"
                 />
               </th>
-              <th>
+              <th className="w-150">
                 Facebook
                 <input
-                  className="w-100-per"
+                  className="w-150"
                   type="text"
                   name="facebook"
                   value={filters.facebook}
@@ -150,21 +150,21 @@ const StudentList = () => {
                   placeholder="Lọc theo Facebook"
                 />
               </th>
-              <th className="w-center-110">
+              <th className="w-110">
                 Cơ sở
                 <input
-                  className="w-115"
+                  className="w-center w-110"
                   type="text"
                   name="departmentCode"
                   value={filters.departmentCode}
                   onChange={handleFilterChange}
-                  placeholder="Lọc theo cơ sở"
+                  placeholder="Lọc cơ sở"
                 />
               </th>
               <th>
                 Note
                 <input
-                  className="w-100-per"
+                  className="w-100per"
                   type="text"
                   name="note"
                   value={filters.note}

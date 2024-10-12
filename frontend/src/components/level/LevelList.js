@@ -74,8 +74,8 @@ const LevelList = () => {
           </Link>
         </td>
         <td>{Level.description}</td>
-        <td className="w-center-110">{Level.session_number}</td>
-        <td className="w-center-110">
+        <td className="w-center">{Level.session_number}</td>
+        <td className="w-center">
           <NumericFormat
             value={Level.course_fees}
             displayType={"text"} // Sử dụng 'text' để không cho phép chỉnh sửa
@@ -111,20 +111,21 @@ const LevelList = () => {
           <thead>
             <tr>
               <th className="w-stt"></th>
-              <th className="w-110">
+              <th className="w-90">
                 Mã cấp độ
                 <input
-                  className="w-110"
+                  className="w-90"
                   type="text"
                   name="level_code"
                   value={filters.level_code}
                   onChange={handleFilterChange}
-                  placeholder="Lọc theo mã"
+                  placeholder="Lọc cấp độ"
                 />
               </th>
-              <th className="w-115">
-                Tên cấp độ
+              <th className="w-250">
+                Tên cấp độ học
                 <input
+                  className="w-250"
                   type="text"
                   name="description"
                   value={filters.description}
@@ -132,10 +133,10 @@ const LevelList = () => {
                   placeholder="Lọc theo tên"
                 />
               </th>
-              <th className="w-center-110">
+              <th className="w-90">
                 Số buổi học
                 <input
-                  className="w-center-110"
+                  className="w-center w-90"
                   type="text"
                   name="session_number"
                   value={filters.session_number}
@@ -143,10 +144,10 @@ const LevelList = () => {
                   placeholder="Lọc số buổi"
                 />
               </th>
-              <th className="w-center-110">
+              <th className="w-120">
                 Học phí
                 <NumericFormat
-                  className="w-center-110"
+                  className="w-center w-120"
                   type="text"
                   name="course_fees"
                   value={filters.course_fees}
@@ -165,7 +166,7 @@ const LevelList = () => {
               <th>
                 Note
                 <input
-                  className="w-100-per"
+                  className="w-100per"
                   type="text"
                   name="note"
                   value={filters.note}

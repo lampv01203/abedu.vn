@@ -51,89 +51,110 @@ const EditLevel = () => {
         <h3 className="card-title">Chỉnh Sửa Cấp Độ Học</h3>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="card-body">
+      <form onSubmit={handleSubmit} className="form-horizontal">
+        <div className="card-body w-500">
           {/* Mã cấp độ */}
-          <div className="form-group">
-            <label htmlFor="levelCode">Mã cấp độ</label>
-            <input
-              type="text"
-              disabled
-              className="form-control"
-              id="levelCode"
-              name="level_code"
-              value={level.level_code}
-              onChange={handleChange}
-              placeholder="Nhập mã cấp độ"
-              required
-            />
+          <div className="form-group row">
+            <label htmlFor="levelCode" className="col-sm-3 col-form-label">
+              Mã cấp độ
+            </label>
+            <div className="col-sm-9">
+              <input
+                type="text"
+                disabled
+                className="form-control"
+                id="levelCode"
+                name="level_code"
+                value={level.level_code}
+                onChange={handleChange}
+                placeholder="Nhập mã cấp độ"
+                required
+              />
+            </div>
           </div>
 
           {/* Nội dung */}
-          <div className="form-group">
-            <label htmlFor="description">Nội dung</label>
-            <input
-              type="text"
-              className="form-control"
-              id="description"
-              name="description"
-              value={level.description}
-              onChange={handleChange}
-              placeholder="Nhập nội dung"
-              required
-            />
+          <div className="form-group row">
+            <label htmlFor="description" className="col-sm-3 col-form-label">
+              Nội dung
+            </label>
+
+            <div className="col-sm-9">
+              <input
+                type="text"
+                className="form-control"
+                id="description"
+                name="description"
+                value={level.description || ""}
+                onChange={handleChange}
+                placeholder="Nhập nội dung"
+                required
+              />
+            </div>
           </div>
 
           {/* Số buổi học */}
-          <div className="form-group">
-            <label htmlFor="sessionNumber">Số buổi học</label>
-            <input
-              type="number"
-              className="form-control"
-              id="sessionNumber"
-              name="session_number"
-              value={level.session_number}
-              onChange={handleChange}
-              placeholder="Nhập số buổi học"
-            />
+          <div className="form-group row">
+            <label htmlFor="sessionNumber" className="col-sm-3 col-form-label">
+              Số buổi học
+            </label>
+            <div className="col-sm-9">
+              <input
+                type="number"
+                className="form-control"
+                id="sessionNumber"
+                name="session_number"
+                value={level.session_number || ""}
+                onChange={handleChange}
+                placeholder="Nhập số buổi học"
+              />
+            </div>
           </div>
 
           {/* Học phí */}
-          <div className="form-group">
-            <label htmlFor="courseFees">Học phí</label>
-            <NumericFormat
-              className="form-control"
-              id="courseFees"
-              name="course_fees"
-              value={level.course_fees}
-              onValueChange={(values) =>
-                handleChange({
-                  target: {
-                    name: "course_fees",
-                    value: values.value || "", // Gán chuỗi rỗng nếu giá trị là undefined
-                  },
-                })
-              }
-              thousandSeparator={true}
-              allowNegative={true}
-              prefix=""
-              placeholder="Nhập học phí"
-              decimalScale={0}
-              displayType="input"
-            />
+          <div className="form-group row">
+            <label htmlFor="courseFees" className="col-sm-3 col-form-label">
+              Học phí
+            </label>
+            <div className="col-sm-9">
+              <NumericFormat
+                className="form-control"
+                id="courseFees"
+                name="course_fees"
+                value={level.course_fees}
+                onValueChange={(values) =>
+                  handleChange({
+                    target: {
+                      name: "course_fees",
+                      value: values.value || "", // Gán chuỗi rỗng nếu giá trị là undefined
+                    },
+                  })
+                }
+                thousandSeparator={true}
+                allowNegative={true}
+                prefix=""
+                placeholder="Nhập học phí"
+                decimalScale={0}
+                displayType="input"
+              />
+            </div>
           </div>
 
           {/* Note */}
-          <div className="form-group">
-            <label htmlFor="note">Ghi chú</label>
-            <textarea
-              className="form-control"
-              id="note"
-              name="note"
-              value={level.note}
-              onChange={handleChange}
-              placeholder="Nhập ghi chú"
-            ></textarea>
+          <div className="form-group row">
+            <label htmlFor="note" className="col-sm-3 col-form-label">
+              Ghi chú
+            </label>
+            <div className="col-sm-9">
+              <textarea
+                className="form-control"
+                id="note"
+                name="note"
+                value={level.note || ""}
+                onChange={handleChange}
+                placeholder="Nhập ghi chú"
+              ></textarea>
+            </div>
           </div>
         </div>
 

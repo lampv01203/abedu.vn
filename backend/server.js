@@ -7,7 +7,7 @@ const studentsRoutes = require('./routes/students');
 const teachersRoutes = require('./routes/teachers');
 const departmentRoutes = require('./routes/departments');
 const levelRoutes = require('./routes/level');
-const classesRoutes = require('./routes/classes');
+const classRoutes = require('./routes/class');
 const session = require('express-session');
 
 
@@ -31,7 +31,7 @@ app.use('/api', studentsRoutes); // Kết nối route
 app.use('/api', teachersRoutes); // Kết nối route
 app.use('/api', departmentRoutes); // Kết nối route chi nhánh
 app.use('/api', levelRoutes); // Kết nối route level
-app.use('/api', classesRoutes); // Kết nối route
+app.use('/api', classRoutes); // Kết nối route
 
 
 const PORT = process.env.PORT || 5000;

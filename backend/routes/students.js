@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Student = require("../models/Student");
 const Department = require("../models/Department");
+const { Op } = require("sequelize");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
+
 
 // Route để lấy danh sách học sinh
 router.get("/getStudents", checkAuth, async (req, res) => {
@@ -89,7 +91,6 @@ router.get("/getStudent/:id", checkAuth, async (req, res) => {
         },
       ],
     });
-
     if (!student) return res.status(404).send("Học sinh không tồn tại.");
     res.json(student);
   } catch (error) {
@@ -106,6 +107,7 @@ router.put("/updateStudent/:id", checkAuth, async (req, res) => {
 
     const studentData = req.body; // Nhận object student từ frontend
     const studentId = req.params.id;
+    console.log(studentId)
 
     // Kiểm tra xem học sinh có tồn tại không
     const existingStudent = await Student.findByPk(studentId);

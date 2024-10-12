@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
-const Classes = require("../models/Classes");
+const Class = require("../models/Class");
 
 router.get("/classes", checkAuth, async (req, res) => {
   try {
@@ -13,10 +13,12 @@ router.get("/classes", checkAuth, async (req, res) => {
     }
     console.log(paramDate);
     // Truy vấn danh sách lớp học
-    const classData = await Classes.sequelize.query(`
+    const classData = await Class.sequelize.query(`
       SELECT 
-          c.weekday, 
-          c.session, 
+          wd.day_of_week, 
+          wd.start_time, 
+          wd.end_time,
+          wd.is_temporary,
           c.class_name AS className, 
           l.level_code AS level,
           teachers.teachers, 
@@ -24,7 +26,9 @@ router.get("/classes", checkAuth, async (req, res) => {
           COUNT(cs.student_id) AS totalStudent,
           GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.student_id SEPARATOR ', ') AS students
       FROM 
-          classes c
+          class c
+      INNER JOIN 
+          class_schedule wd ON c.class_id = wd.class_id
       LEFT JOIN
           class_students cs ON c.class_id = cs.class_id
       LEFT JOIN 
@@ -47,33 +51,35 @@ router.get("/classes", checkAuth, async (req, res) => {
       ) AS teachers ON c.class_id = teachers.class_id
       WHERE 
           c.del_flg = 0
+          AND wd.del_flg = 0
           AND (:userDepartmentId = 1 OR c.department_id = :userDepartmentId)
           AND c.Start_date >= DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
           AND c.Start_date < DATE_ADD(DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY), INTERVAL 7 DAY)
       GROUP BY 
-          c.class_id, c.weekday, c.session, c.class_name, l.level_code, teachers.teachers, c.note
+          wd.day_of_week, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name, l.level_code, teachers.teachers, c.note
       ORDER BY 
-          c.weekday, c.session, c.class_name;
+          wd.day_of_week, wd.start_time, c.class_name;
     `,
       {
         replacements: {
           userDepartmentId,
           paramDate,
         },
-        type: Classes.sequelize.QueryTypes.SELECT,
+        type: Class.sequelize.QueryTypes.SELECT,
       }
     );
 
     // Xử lý để trả về đúng format JSON
     const data = classData.reduce((acc, curr) => {
       let sessionObj = acc.find(
-        (item) => item.weekday === curr.weekday && item.session === curr.session
+        (item) => item.day_of_week === curr.day_of_week && item.start_time === curr.start_time && item.end_time === curr.end_time
       );
 
       if (!sessionObj) {
         sessionObj = {
-          weekday: curr.weekday,
-          session: curr.session,
+          day_of_week: curr.day_of_week,
+          start_time: curr.start_time,
+          end_time: curr.end_time,
           classes: [],
         };
         acc.push(sessionObj);

@@ -55,12 +55,13 @@ const AddLevel = () => {
         <h3 className="card-title">Thêm Cấp Độ Mới</h3>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="card-body">
+      <form onSubmit={handleSubmit} className="form-horizontal">
+        <div className="card-body w-500">
           {/* Mã cấp độ */}
-          <div className="form-group">
-            <label htmlFor="levelCode">Mã cấp độ</label>
-            <input
+          <div className="form-group row">
+            <label htmlFor="levelCode" className="col-sm-3 col-form-label">Mã cấp độ</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="levelCode"
@@ -71,11 +72,13 @@ const AddLevel = () => {
               required
             />
           </div>
+          </div>
 
           {/* Nội dung */}
-          <div className="form-group">
-            <label htmlFor="description">Nội dung</label>
-            <input
+          <div className="form-group row">
+            <label htmlFor="description" className="col-sm-3 col-form-label">Nội dung</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="description"
@@ -86,11 +89,13 @@ const AddLevel = () => {
               required
             />
           </div>
+          </div>
 
           {/* Số buổi học */}
-          <div className="form-group">
-            <label htmlFor="sessionNumber">Số buổi học</label>
-            <input
+          <div className="form-group row">
+            <label htmlFor="sessionNumber" className="col-sm-3 col-form-label">Số buổi học</label>
+            <div className="col-sm-9">
+              <input
               type="number"
               className="form-control"
               id="sessionNumber"
@@ -100,11 +105,13 @@ const AddLevel = () => {
               placeholder="Nhập số buổi học"
             />
           </div>
+          </div>
 
           {/* Học phí */}
-          <div className="form-group">
-            <label htmlFor="courseFees">Học phí</label>
-            <NumericFormat
+          <div className="form-group row">
+            <label htmlFor="courseFees" className="col-sm-3 col-form-label">Học phí</label>
+            <div className="col-sm-9">
+              <NumericFormat
               className="form-control"
               id="courseFees"
               name="course_fees"
@@ -125,11 +132,13 @@ const AddLevel = () => {
               displayType="input" // Hiển thị dưới dạng input
             />
           </div>
+          </div>
 
           {/* Note */}
-          <div className="form-group">
-            <label htmlFor="note">Ghi chú</label>
-            <textarea
+          <div className="form-group row">
+            <label htmlFor="note" className="col-sm-3 col-form-label">Ghi chú</label>
+            <div className="col-sm-9">
+              <textarea
               className="form-control"
               id="note"
               name="note"
@@ -137,6 +146,7 @@ const AddLevel = () => {
               onChange={handleChange}
               placeholder="Nhập ghi chú"
             ></textarea>
+          </div>
           </div>
         </div>
 

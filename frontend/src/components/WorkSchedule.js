@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { format } from "date-fns";
 
 const WorkSchedule = () => {
   const [classes, setClasses] = useState([]); // State để lưu trữ danh sách lớp học
@@ -9,7 +10,7 @@ const WorkSchedule = () => {
   // Hàm để gọi API
   const fetchClasses = async (date) => {
     try {
-      const response = await axios.get(`/api/classes?date=${date}`);
+      const response = await axios.get(`/api/classSchedule?date=${date}`);
       setClasses(response.data); // Lưu dữ liệu vào state
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -47,8 +48,10 @@ const WorkSchedule = () => {
           {index === 0 && (
             <td rowSpan={item.classes.length}>{item.session}</td>
           )} */}
-          <td className="classItem-weekday">{item.weekday}</td>
-          <td>{item.session}</td>
+          <td className="classItem-weekday">{item.day_of_week}</td>
+          <td>
+            {item.start_time.slice(0, 5)} - {item.end_time.slice(0, 5)}
+          </td>
           <td className="classItem-className">{classItem.className}</td>
           <td>{classItem.level}</td>
           <td className="classItem-totalStudent">{classItem.totalStudent}</td>
@@ -82,13 +85,13 @@ const WorkSchedule = () => {
           <table className="table table-head-fixed table-bordered table-hover">
             <thead>
               <tr>
-                <th className="classItem-weekday">Ngày</th>
-                <th className="classItem-session">Ca học</th>
-                <th className="classItem-className">Lớp</th>
-                <th className="classItem-level">Cấp độ</th>
-                <th className="classItem-totalStudent">Sĩ số</th>
-                <th className="classItem-teacher">GVCN</th>
-                <th>Học sinh</th>
+                <th className="w-90">Ngày</th>
+                <th className="w-120">Ca học</th>
+                <th className="w-150">Lớp</th>
+                <th className="w-90">Cấp độ</th>
+                <th className="w-60">Sĩ số</th>
+                <th className="w-200">GVCN</th>
+                <th className="w-300">Học sinh</th>
                 <th>Note</th>
               </tr>
             </thead>

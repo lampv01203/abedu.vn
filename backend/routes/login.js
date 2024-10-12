@@ -57,22 +57,12 @@ router.post('/logout', (req, res) => {
 });
 
 router.post("/checkAuth", (req, res) => {
-  const { token } = req.body;
-  
-  if (!token) {
-    return res.status(401).json({ message: "Token không tồn tại" });
-  }
-
-  try {
-    // Xác thực token
-    const decoded = jwt.verify(token, secretKey);
-    
-
+  if (req.session.user) {
     // Nếu xác thực thành công
-    res.status(200).json({ message: "Token hợp lệ", user: decoded });
-  } catch (error) {
-    // Token không hợp lệ hoặc hết hạn
-    res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
+    res.status(200).json({ message: "authorized", user: req.session.user });
+  } else {
+    // Nếu chưa đăng nhập, trả về lỗi hoặc chuyển hướng về trang đăng nhập
+    res.status(401).json({ message: "Unauthorized, please login." });
   }
 });
 

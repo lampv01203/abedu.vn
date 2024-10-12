@@ -76,11 +76,12 @@ const AddTeacher = () => {
         <h3 className="card-title">Đăng ký Giáo Viên</h3>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="card-body">
-          <div className="form-group">
-            <label htmlFor="full_name">Họ và tên</label>
-            <input
+      <form onSubmit={handleSubmit} className="form-horizontal">
+        <div className="card-body w-550">
+          <div className="form-group row">
+            <label htmlFor="full_name" className="col-sm-3 col-form-label">Họ và tên</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="full_name"
@@ -90,9 +91,11 @@ const AddTeacher = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="birthday">Năm sinh</label>
-            <input
+          </div>
+          <div className="form-group row">
+            <label htmlFor="birthday" className="col-sm-3 col-form-label">Năm sinh</label>
+            <div className="col-sm-9">
+              <input
               type="date"
               className="form-control"
               id="birthday"
@@ -102,9 +105,11 @@ const AddTeacher = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="phone">Số điện thoại</label>
-            <input
+          </div>
+          <div className="form-group row">
+            <label htmlFor="phone" className="col-sm-3 col-form-label">Số điện thoại</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="phone"
@@ -113,9 +118,11 @@ const AddTeacher = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="facebook">Facebook</label>
-            <input
+          </div>
+          <div className="form-group row">
+            <label htmlFor="facebook" className="col-sm-3 col-form-label">Facebook</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="facebook"
@@ -124,9 +131,11 @@ const AddTeacher = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="department_id">Chi nhánh</label>
-            <select
+          </div>
+          <div className="form-group row">
+            <label htmlFor="department_id" className="col-sm-3 col-form-label">Chi nhánh</label>
+            <div className="col-sm-9">
+              <select
               className="form-control"
               id="department_id"
               name="department_id"
@@ -141,10 +150,12 @@ const AddTeacher = () => {
                 </option>
               ))}
             </select>
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="address">Địa chỉ</label>
-            <input
+          <div className="form-group row">
+            <label htmlFor="address" className="col-sm-3 col-form-label">Địa chỉ</label>
+            <div className="col-sm-9">
+              <input
               type="text"
               className="form-control"
               id="address"
@@ -153,15 +164,18 @@ const AddTeacher = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="note">Ghi chú</label>
-            <textarea
+          </div>
+          <div className="form-group row">
+            <label htmlFor="note" className="col-sm-3 col-form-label">Ghi chú</label>
+            <div className="col-sm-9">
+              <textarea
               className="form-control"
               id="note"
               name="note"
               value={formData.note}
               onChange={handleChange}
             />
+          </div>
           </div>
         </div>
 

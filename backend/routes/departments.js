@@ -6,11 +6,14 @@ const checkAuth = require('./auth'); // Import hàm checkAuth từ auth.js
 // Route để lấy danh sách các chi nhánh
 router.get('/departments', checkAuth, async (req, res) => {
   try {
+    const user = req.session.user;
+
+    // Tạo điều kiện tìm kiếm theo department_id nếu user.department_id không phải là 1
+    const whereClause =
+      user.department_id !== 1 ? { department_id: user.department_id } : {};
     // Lấy danh sách các department với điều kiện department_id <> 1
     const departments = await Department.findAll({
-      where: {
-        department_id: { [Op.ne]: 1 } // Sử dụng Op.ne để lọc
-      }
+      where: whereClause,
     });
     
     res.json(departments);

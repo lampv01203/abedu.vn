@@ -8,8 +8,12 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "overlayscrollbars";
 import "apexcharts";
 import "admin-lte/dist/js/adminlte.js"; // Import AdminLTE JS
+import "admin-lte/dist/css/adminlte.css"; // Import AdminLTE JS
+import 'select2/dist/css/select2.min.css';
 import '../css/table.css'; // Import Bootstrap CSS
 import '../css/table.scss'; // Import Bootstrap CSS
+import '../css/form.css'; // Import Bootstrap CSS
+import '../css/form.scss'; // Import Bootstrap CSS
 
 const TopScreen = () => {
   const navigate = useNavigate();
@@ -87,7 +91,7 @@ const TopScreen = () => {
                   className="user-image rounded-circle shadow"
                   alt="User"
                 />
-                <span className="d-none d-md-inline">ABedu</span>
+                <span className="d-none d-md-inline col-form-label">ABedu</span>
               </button>
               <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <li className="user-header text-bg-primary">
@@ -171,7 +175,7 @@ const TopScreen = () => {
               </li>
               <li className="nav-item">
                 <Link to="/classlist" className="nav-link">
-                  <i className="nav-icon fa-solid fa-users"></i>
+                  <i className="nav-icon fa-solid fa-school"></i>
                   <p>
                     Danh sách lớp học
                     <i className="nav-arrow bi bi-chevron-right"></i>
@@ -181,7 +185,7 @@ const TopScreen = () => {
               {user?.department_id === 1 && (
                 <li className="nav-item">
                   <Link to="/levellist" className="nav-link">
-                    <i className="nav-icon fa-solid fa-users"></i>
+                    <i className="nav-icon fa-duotone fa-solid fa-layer-group"></i>
                     <p>
                       Danh sách cấp độ
                       <i className="nav-arrow bi bi-chevron-right"></i>

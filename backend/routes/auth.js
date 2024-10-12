@@ -1,4 +1,4 @@
-// backend/middleware/auth.js
+// backend/auth.js
 const checkAuth = (req, res, next) => {
     if (req.session.user) {
       // Nếu đã đăng nhập, tiếp tục xử lý

@@ -2,6 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Level = require("../models/Level"); // Import Sequelize model
 const checkAuth = require("./auth"); // Import middleware checkAuth
+const db = require("../config/db");
+
+// Route to get levels
+router.get("/levels", async (req, res) => {
+  try {
+    const levels = await Level.findAll({
+      attributes: ["level_id", "level_code"],
+      where: { del_flg: false },
+    });
+    res.json(levels);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // API lấy danh sách cấp độ
 router.get("/getLevels", checkAuth, async (req, res) => {
@@ -27,7 +41,8 @@ router.post("/addLevel", checkAuth, async (req, res) => {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
-    const { level_code, description, session_number, course_fees, note } = req.body;
+    const { level_code, description, session_number, course_fees, note } =
+      req.body;
 
     // Kiểm tra các trường bắt buộc
     if (!level_code || !description) {
@@ -89,7 +104,8 @@ router.put("/updateLevel/:id", checkAuth, async (req, res) => {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
-    const { level_code, description, session_number, course_fees, note } = req.body;
+    const { level_code, description, session_number, course_fees, note } =
+      req.body;
 
     const level = await Level.findByPk(req.params.id);
     if (!level) {
