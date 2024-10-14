@@ -5,6 +5,64 @@ const Department = require("../models/Department");
 const { Op } = require("sequelize");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 
+// Route để lấy danh sách học sinh
+router.get("/students", checkAuth, async (req, res) => {
+  try {
+    const user = req.session.user;
+
+    const paramLevelId = req.query.level_id;
+    const paramDepartmentId = req.query.department_id;
+
+    const userDepartmentId = user.department_id;
+
+    const students = await Student.sequelize.query(
+      `
+        SELECT 
+            s.student_id, 
+            s.full_name, 
+            s.birthday, 
+            s.phone,
+            s.facebook,
+            d.department_code, 
+            s.note
+        FROM 
+            students s
+        INNER JOIN 
+            class_students cs ON s.student_id = cs.student_id
+        INNER JOIN 
+            level l ON cs.level_id = l.level_id
+        LEFT JOIN 
+            department d ON s.department_id = d.department_id
+        WHERE 
+            s.del_flg = 0
+            AND (:userDepartmentId = 1 OR s.department_id = :userDepartmentId)
+            AND cs.del_flg = 0
+            AND cs.queue_flag = 1
+            AND cs.class_id is NULL
+            AND l.del_flg = 0
+            AND l.level_id = :paramLevelId
+            AND (:paramDepartmentId = 1 OR s.department_id = :paramDepartmentId)
+        ORDER BY 
+            s.full_name;
+      `,
+      {
+        replacements: {
+          userDepartmentId,
+          paramLevelId,
+          paramDepartmentId,
+        },
+        type: Student.sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    res.json(students);
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách học sinh theo cấp độ:", error);
+    res
+      .status(500)
+      .json({ message: "Đã xảy ra lỗi khi lấy danh sách học sinh theo cấp độ" });
+  }
+});
 
 // Route để lấy danh sách học sinh
 router.get("/getStudents", checkAuth, async (req, res) => {
@@ -107,7 +165,7 @@ router.put("/updateStudent/:id", checkAuth, async (req, res) => {
 
     const studentData = req.body; // Nhận object student từ frontend
     const studentId = req.params.id;
-    console.log(studentId)
+    console.log(studentId);
 
     // Kiểm tra xem học sinh có tồn tại không
     const existingStudent = await Student.findByPk(studentId);

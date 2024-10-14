@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import TeacherSelect from "./TeacherSelect"; // Import TeacherSelect
+import StudentSelect from "./StudentSelect"; // Import StudentSelect
 
 const AddClass = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const AddClass = () => {
     end_date: "",
     note: "",
     teachers: [],
+    students: [], // Thêm field students để lưu học sinh đã chọn
     schedules: [{ day_of_week: "", start_time: "", end_time: "" }],
   });
 
@@ -68,6 +70,11 @@ const AddClass = () => {
       ],
     });
   };
+  // Hàm để xóa schedule tại index được chỉ định
+  const removeSchedule = (index) => {
+    const newSchedules = classData.schedules.filter((_, i) => i !== index);
+    setClassData({ ...classData, schedules: newSchedules });
+  };
 
   // Hàm để xử lý thay đổi từ TeacherSelect
   const setSelectedTeachers = (selectedTeachers) => {
@@ -91,17 +98,17 @@ const AddClass = () => {
   return (
     <div className="card card-primary">
       <div className="card-header">
-        <h3 className="card-title">Add New Class</h3>
+        <h3 className="card-title">Đăng Ký Lớp Học Mới</h3>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="card-body w-650">
+        <div className="card-body w-750">
           {/* Class Name */}
           <div className="form-group row">
             <label htmlFor="class_name" className="col-sm-3 col-form-label">
-              Class Name
+              Tên Lớp Học
             </label>
-            <div className="col-sm-9">
+            <div className="col-sm-5">
               <input
                 type="text"
                 className="form-control"
@@ -117,9 +124,9 @@ const AddClass = () => {
           {/* Level */}
           <div className="form-group row">
             <label htmlFor="level_id" className="col-sm-3 col-form-label">
-              Level
+              Cấp Độ Học
             </label>
-            <div className="col-sm-9">
+            <div className="col-sm-5">
               <select
                 className="form-control"
                 id="level_id"
@@ -128,7 +135,7 @@ const AddClass = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Level</option>
+                <option value="">Chọn Cấp Độ</option>
                 {levels.map((level) => (
                   <option key={level.level_id} value={level.level_id}>
                     {level.level_code}
@@ -141,9 +148,9 @@ const AddClass = () => {
           {/* Department */}
           <div className="form-group row">
             <label htmlFor="department_id" className="col-sm-3 col-form-label">
-              Department
+              Cơ Sở
             </label>
-            <div className="col-sm-9">
+            <div className="col-sm-5">
               <select
                 className="form-control"
                 id="department_id"
@@ -152,7 +159,7 @@ const AddClass = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select Department</option>
+                <option value="">Chọn Cơ Sở</option>
                 {departments.map((department) => (
                   <option
                     key={department.department_id}
@@ -168,12 +175,12 @@ const AddClass = () => {
           {/* Schedules */}
           <div className="form-group row">
             <label htmlFor="workingDays" className="col-sm-3 col-form-label">
-              Schedule
+              Lịch Học
             </label>
             <div className="col-sm-9">
               {classData.schedules.map((schedule, index) => (
                 <div key={index} className="row mb-2">
-                  <div className="col-sm-4">
+                  <div className="col-sm-3">
                     <select
                       id="workingDays"
                       className="form-control"
@@ -187,7 +194,7 @@ const AddClass = () => {
                       }
                       required
                     >
-                      <option value="">Select Day</option>
+                      <option value="">Chọn Thứ</option>
                       {workingDays.map((day) => (
                         <option key={day.day_of_week} value={day.day_of_week}>
                           {day.day_of_week}
@@ -201,7 +208,11 @@ const AddClass = () => {
                       className="form-control"
                       value={schedule.start_time}
                       onChange={(e) =>
-                        handleScheduleChange(index, "start_time", e.target.value)
+                        handleScheduleChange(
+                          index,
+                          "start_time",
+                          e.target.value
+                        )
                       }
                       required
                     />
@@ -217,6 +228,15 @@ const AddClass = () => {
                       required
                     />
                   </div>
+                  <div className="col-sm-1">
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => removeSchedule(index)}
+                    >
+                      X
+                    </button>
+                  </div>
                 </div>
               ))}
               <button
@@ -224,7 +244,7 @@ const AddClass = () => {
                 className="btn btn-secondary"
                 onClick={addSchedule}
               >
-                + Add Schedule
+                + Thêm lịch học
               </button>
             </div>
           </div>
@@ -232,9 +252,9 @@ const AddClass = () => {
           {/* Start Date */}
           <div className="form-group row">
             <label htmlFor="start_date" className="col-sm-3 col-form-label">
-              Start Date
+              Ngày Bắt Đầu Học
             </label>
-            <div className="col-sm-9">
+            <div className="col-sm-5">
               <input
                 type="date"
                 className="form-control"
@@ -249,9 +269,9 @@ const AddClass = () => {
           {/* End Date */}
           <div className="form-group row">
             <label htmlFor="end_date" className="col-sm-3 col-form-label">
-              End Date
+              Ngày Kết Khóa
             </label>
-            <div className="col-sm-9">
+            <div className="col-sm-5">
               <input
                 type="date"
                 className="form-control"
@@ -266,23 +286,9 @@ const AddClass = () => {
           {/* Teachers */}
           <div className="form-group row">
             <label htmlFor="teachers" className="col-sm-3 col-form-label">
-              Teachers
+              Giáo Viên
             </label>
             <div className="col-sm-9">
-              {/* <select
-                className="form-control"
-                id="teachers"
-                name="teachers"
-                value={classData.teachers}
-                onChange={(e) => setClassData({ ...classData, teachers: [...e.target.selectedOptions].map(option => option.value) })}
-                multiple
-              >
-                {teachers.map(teacher => (
-                  <option key={teacher.teacher_id} value={teacher.teacher_id}>
-                    {teacher.full_name}
-                  </option>
-                ))}
-              </select> */}
               <TeacherSelect
                 teachers={teachers}
                 selectedTeachers={classData.teachers}
@@ -307,11 +313,19 @@ const AddClass = () => {
             </div>
           </div>
         </div>
-
+        {/* Student Select */}
+        <StudentSelect
+          levelId={classData.level_id}
+          departmentId={classData.department_id}
+          selectedStudents={classData.students}
+          setSelectedStudents={(students) =>
+            setClassData({ ...classData, students })
+          }
+        />
         {/* Submit Button */}
         <div className="card-footer">
           <button type="submit" className="btn btn-primary">
-            Submit
+            Thêm Lớp Học
           </button>
         </div>
       </form>

@@ -4,8 +4,12 @@ import { AuthContext } from "./AuthContext";
 const withAdmin = ({ children }) => {
   const { isAuthenticated, loading } = useContext(AuthContext);
   if (loading) {
-    // Có thể hiển thị một loader ở đây nếu cần
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Đang tải...</p>
+      </div>
+    );
   }
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

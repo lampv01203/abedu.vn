@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
-const Class = require("../models/Class");
+const Class = require("../models/Classes");
 
 router.get("/classes", checkAuth, async (req, res) => {
   try {

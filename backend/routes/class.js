@@ -1,7 +1,7 @@
 // backend/routes/class.js
 const express = require("express");
 const router = express.Router();
-const Class = require("../models/Class");
+const Class = require("../models/Classes");
 const Teacher = require("../models/Teacher");
 const Level = require("../models/Level");
 const Department = require("../models/Department");
@@ -28,7 +28,6 @@ router.get("/classSchedule", checkAuth, async (req, res) => {
     if (!paramDate) {
       return res.status(400).json({ message: "Thiếu tham số ngày (date)" });
     }
-    console.log(paramDate);
     // Truy vấn danh sách lớp học
     const classData = await Class.sequelize.query(
       `

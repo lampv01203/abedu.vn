@@ -17,21 +17,23 @@ import '../css/form.scss'; // Import Bootstrap CSS
 
 const TopScreen = () => {
   const navigate = useNavigate();
-  let user = null;
+  const [user, setUser] = React.useState(null); // Khởi tạo state cho user
 
-  // Lấy thông tin user từ localStorage
-  try {
-    user = JSON.parse(localStorage.getItem("user"));
-  } catch (error) {
-    navigate("/login"); // Chuyển hướng về màn hình login
-  }
 
   // Kiểm tra user và redirect nếu không có
   useEffect(() => {
-    if (!user) {
+    // Lấy thông tin user từ localStorage
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData) {
+        navigate("/login"); // Chuyển hướng về màn hình login
+      } else {
+        setUser(userData); // Cập nhật state user
+      }
+    } catch (error) {
       navigate("/login"); // Chuyển hướng về màn hình login
     }
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {

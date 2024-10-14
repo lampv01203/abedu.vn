@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 
-const StudentList = () => {
-  const [students, setStudents] = useState([]); // Dữ liệu sinh viên
+const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStudents }) => {
+  const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]); // Dữ liệu sau khi lọc
   const [filters, setFilters] = useState({
     fullName: "",
@@ -15,25 +14,36 @@ const StudentList = () => {
     note: "",
   });
 
-  // Lấy dữ liệu sinh viên từ API
+  // Fetch students when levelId changes
   useEffect(() => {
-    axios
-      .get("/api/getStudents")
-      .then((response) => {
-        const studentData = response.data.map((student) => ({
-          ...student,
-          department_code: student.Department?.department_code,
-        }));
-        setStudents(studentData);
-        setFilteredStudents(studentData);
-      })
-      .catch((error) => {
-        // if (error.response && error.response.status === 401) {
-        //   // Chuyển hướng đến trang login
-        //   window.location.href = "/login"; // Hoặc sử dụng React Router để chuyển hướng
-        // }
-      });
-  }, []);
+    const fetchStudents = async () => {
+      if ((levelId && departmentId)) {
+        try {
+          const response = await axios.get("/api/students", {
+            params: { level_id: levelId, department_id: departmentId },
+          });
+          setStudents(response.data); // Lưu danh sách học sinh
+          setFilteredStudents(response.data);
+        } catch (error) {
+          console.error("Error fetching students", error);
+        }
+      } else {
+        setStudents([]); // Reset danh sách học sinh nếu không có levelId
+      }
+    };
+
+    fetchStudents();
+  }, [levelId, departmentId]);
+
+  // Hàm để thêm hoặc loại bỏ học sinh khỏi danh sách
+  const toggleStudent = (student_id) => {
+    const isSelected = selectedStudents.includes(student_id);
+    const newStudents = isSelected
+      ? selectedStudents.filter((id) => id !== student_id)
+      : [...selectedStudents, student_id];
+
+    setSelectedStudents(newStudents);
+  };
 
   // Hàm lọc dữ liệu dựa trên input filter
   useEffect(() => {
@@ -64,48 +74,17 @@ const StudentList = () => {
     }));
   };
 
-  const renderRows = () => {
-    return filteredStudents.map((student, index) => (
-      <tr key={student.student_id}>
-        <td className="w-stt">{index + 1}</td>
-        <td>
-          <Link to={`/editstudent/${student.student_id}`} className="text-primary">
-            {student.full_name}
-          </Link>
-        </td>
-        <td className="w-center">
-          {format(new Date(student.birthday), "dd/MM/yyyy")}
-        </td>
-        <td className="w-center">{student.phone}</td>
-        <td>{student.facebook}</td>
-        <td className="w-center">{student.department_code}</td>
-        <td>{student.note}</td>
-      </tr>
-    ));
-  };
-
+  // Render bảng danh sách học sinh
   return (
-    <div className="card">
+    <div className="card max-h-402">
       <div className="card-header">
         <h3 className="card-title">Danh sách học sinh</h3>
-        <div className="card-tools">
-          <div className="input-group input-group-sm">
-            <Link
-              to="/addstudent"
-              type="submit"
-              name="table_search"
-              className="btn btn-primary float-right"
-            >
-              <i className="far fa-plus-square"></i> Đăng ký học sinh
-            </Link>
-          </div>
-        </div>
       </div>
       <div className="card-body table-responsive p-0 table-container">
         <table className="table table-head-fixed table-bordered table-hover">
           <thead>
             <tr>
-              <th className="w-stt"></th>
+              <th className="w-70 w-center w-1rem"></th>
               <th className="w-180">
                 Họ và tên
                 <input
@@ -174,11 +153,38 @@ const StudentList = () => {
               </th>
             </tr>
           </thead>
-          <tbody>{renderRows()}</tbody>
+          <tbody>
+            {filteredStudents.map((student) => {
+              const isSelected = selectedStudents.includes(student.student_id);
+              return (
+                <tr key={student.student_id}>
+                  <td>
+                    <button
+                      type="button"
+                      className={`btn ${
+                        isSelected ? "btn-danger" : "btn-success"
+                      }`}
+                      onClick={() => toggleStudent(student.student_id)}
+                    >
+                      {isSelected ? "-" : "+"}
+                    </button>
+                  </td>
+                  <td>{student.full_name}</td>
+                  <td className="w-center">
+                    {format(new Date(student.birthday), "dd/MM/yyyy")}
+                  </td>
+                  <td className="w-center">{student.phone}</td>
+                  <td>{student.facebook}</td>
+                  <td className="w-center">{student.department_code}</td>
+                  <td>{student.note}</td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
     </div>
   );
 };
 
-export default StudentList;
+export default StudentSelect;

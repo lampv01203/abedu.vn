@@ -14,8 +14,14 @@ const session = require('express-session');
 dotenv.config(); // Load biến môi trường từ file .env
 
 const app = express();
-app.use(cors());
 app.use(express.json()); // Phân tích dữ liệu JSON từ body của request
+app.use(express.urlencoded({ extended: true }));
+
+// Cấu hình CORS
+app.use(cors({
+  origin: 'http://localhost:3000', // Địa chỉ frontend của bạn
+  credentials: true, // Cho phép gửi cookie
+}));
 
 app.use(session({
   secret: '$2a$10$mxcTqGR.pbKoaoabKQju/OL7JRLW.4S8mIGMUla43iEVtuS.hhSLO', // Khóa bí mật để mã hóa session

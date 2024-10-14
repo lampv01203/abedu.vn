@@ -1,41 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from 'axios'; // Import axios đã được cấu hình từ App.js
 import "../css/login.css"; // Import Bootstrap CSS
 import "admin-lte/dist/css/adminlte.min.css"; // Import AdminLTE CSS
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
-//import 'mdb-ui-kit/css/mdb.min.css'; // Import MDB CSS nếu cần
-//import 'font-awesome/css/font-awesome.min.css'; // Import Font Awesome cho biểu tượng
+import { AuthContext } from "./AuthContext";
 
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { loginUser } = useContext(AuthContext); // Sử dụng loginUser từ context
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post("/api/login", { userId, password });
       if (response.data.success) {
-        // Lưu token vào localStorage (nếu cần)
-        localStorage.setItem("token", response.data.token);
-        // Lấy thông tin người dùng và lưu vào localStorage
-        const userData = response.data.user;
-
-        // Lưu thông tin người dùng vào localStorage
-        localStorage.setItem("user", JSON.stringify(userData));
-        // Nếu đăng nhập thành công, chuyển hướng tới màn hình Top
-        navigate("/");
+        // Đăng nhập thành công, gọi hàm loginUser để cập nhật trạng thái
+        loginUser(response.data.token, response.data.user);
+        navigate("/"); // Chuyển hướng tới trang Top
       } else {
         setMessage(response.data.message); // Thiết lập thông điệp lỗi từ phản hồi
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setMessage(error.response?.data.message || "Có lỗi xảy ra");
-      } else {
-        setMessage("Có lỗi xảy ra");
-      }
+      setMessage(error.response?.data.message || "Có lỗi xảy ra");
     }
   };
   return (
