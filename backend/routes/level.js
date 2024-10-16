@@ -3,6 +3,7 @@ const router = express.Router();
 const Level = require("../models/Level"); // Import Sequelize model
 const checkAuth = require("./auth"); // Import middleware checkAuth
 const db = require("../config/db");
+const UserRole = require('../models/UserRole');
 
 // Route to get levels
 router.get("/levels", async (req, res) => {
@@ -21,7 +22,7 @@ router.get("/levels", async (req, res) => {
 router.get("/getLevels", checkAuth, async (req, res) => {
   try {
     const user = req.session.user;
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
@@ -37,7 +38,7 @@ router.get("/getLevels", checkAuth, async (req, res) => {
 router.post("/addLevel", checkAuth, async (req, res) => {
   try {
     const user = req.session.user;
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
@@ -81,7 +82,7 @@ router.post("/addLevel", checkAuth, async (req, res) => {
 router.get("/getLevel/:id", checkAuth, async (req, res) => {
   try {
     const user = req.session.user;
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
@@ -100,7 +101,7 @@ router.get("/getLevel/:id", checkAuth, async (req, res) => {
 router.put("/updateLevel/:id", checkAuth, async (req, res) => {
   try {
     const user = req.session.user;
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       return res.status(403).json({ message: "Không có quyền truy cập" });
     }
 
@@ -129,6 +130,11 @@ router.put("/updateLevel/:id", checkAuth, async (req, res) => {
 // Route để xóa cấp độ học
 router.delete("/deleteLevel/:id", checkAuth, async (req, res) => {
   try {
+    const user = req.session.user;
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
+      return res.status(403).json({ message: "Không có quyền truy cập" });
+    }
+
     const level = await Level.findByPk(req.params.id);
 
     if (!level)

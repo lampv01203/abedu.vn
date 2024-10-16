@@ -17,6 +17,7 @@ import AddLevel from "./components/level/AddLevel.js";
 import EditLevel from "./components/level/EditLevel.js";
 import ClassList from "./components/class/ClassList.js";
 import AddClass from "./components/class/AddClass.js";
+import EditClass from "./components/class/EditClass.js";
 import axios from "axios";
 
 // Thiết lập axios với baseURL và tùy chọn withCredentials
@@ -59,6 +60,7 @@ const App = () => {
             {/* Class component */}
             <Route path="classList" element={<WithAuth><ClassList /></WithAuth>} />
             <Route path="addclass" element={<WithAuth><AddClass /></WithAuth>} />
+            <Route path="editclass" element={<WithAuth><EditClass /></WithAuth>} />
 
             {/* Route được bảo vệ thêm với WithAdmin */}
             <Route path="levellist" element={<WithAdmin><LevelList /></WithAdmin>} />

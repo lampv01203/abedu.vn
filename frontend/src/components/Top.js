@@ -14,6 +14,7 @@ import '../css/table.css'; // Import Bootstrap CSS
 import '../css/table.scss'; // Import Bootstrap CSS
 import '../css/form.css'; // Import Bootstrap CSS
 import '../css/form.scss'; // Import Bootstrap CSS
+import UserRole from '../../../backend/models/UserRole';
 
 const TopScreen = () => {
   const navigate = useNavigate();
@@ -184,7 +185,7 @@ const TopScreen = () => {
                   </p>
                 </Link>
               </li>
-              {user?.department_id === 1 && (
+              {user?.role === UserRole.SYSTEM && user?.role === UserRole.ADMIN && (
                 <li className="nav-item">
                   <Link to="/levellist" className="nav-link">
                     <i className="nav-icon fa-duotone fa-solid fa-layer-group"></i>
