@@ -10,7 +10,7 @@ const WorkSchedule = () => {
   // Hàm để gọi API
   const fetchClasses = async (date) => {
     try {
-      const response = await axios.get(`/api/classSchedule?date=${date}`);
+      const response = await axios.get(`/api/classWeeklyScheduleByDate?date=${date}`);
       setClasses(response.data); // Lưu dữ liệu vào state
     } catch (error) {
       console.error('Error fetching classes:', error);

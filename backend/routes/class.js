@@ -20,7 +20,91 @@ router.get("/workingDays", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/classSchedule", checkAuth, async (req, res) => {
+router.get("/classTeacher/:id", checkAuth, async (req, res) => {
+  try {
+    console.log(req.params.id)
+    const paramClassId = req.params.id
+    const classTeacher = await Class.sequelize.query(`
+      SELECT 
+            teacher_id
+        FROM 
+          class_teacher
+        WHERE
+          del_flg = 0
+          AND class_id = :paramClassId
+      `,
+      {
+        replacements: {
+          paramClassId
+        },
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(classTeacher);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/classStudent/:id", checkAuth, async (req, res) => {
+  try {
+    console.log(req.params.id)
+    const paramClassId = req.params.id
+    const classStudent = await Class.sequelize.query(`
+      SELECT 
+            student_id
+        FROM 
+          class_students
+        WHERE
+          del_flg = 0
+          AND class_id = :paramClassId
+      `,
+      {
+        replacements: {
+          paramClassId
+        },
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(classStudent);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/classSchedule/:id", checkAuth, async (req, res) => {
+  try {
+    console.log(req.params.id)
+    const paramClassId = req.params.id
+    const classSchedule = await Class.sequelize.query(`
+      SELECT 
+            wd.day_of_week, 
+            wd.start_time, 
+            wd.end_time,
+            wd.is_temporary
+        FROM 
+          class_schedule wd
+        INNER JOIN
+          class c ON wd.class_id = c.class_id
+        WHERE
+          c.del_flg = 0
+          AND wd.del_flg = 0
+          AND c.class_id = :paramClassId
+      `,
+      {
+        replacements: {
+          paramClassId
+        },
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(classSchedule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/classWeeklyScheduleByDate", checkAuth, async (req, res) => {
   try {
     const userDepartmentId = req.session.user.department_id;
     const paramDate = req.query.date; // Ngày được truyền từ client (ví dụ: '2024-10-09')
@@ -160,6 +244,7 @@ router.get("/getClasses", checkAuth, async (req, res) => {
 // Route để lấy thông tin lớp học theo ID
 router.get("/getClass/:id", checkAuth, async (req, res) => {
   try {
+    console.log(req.params)
     const classInfo = await Class.findOne({
       where: {
         class_id: req.params.id,
@@ -173,10 +258,6 @@ router.get("/getClass/:id", checkAuth, async (req, res) => {
         {
           model: Level,
           attributes: ["level_code"], // Lấy level_code từ bảng Level
-        },
-        {
-          model: Teacher,
-          attributes: ["full_name"], // Lấy full_name từ bảng Teacher
         },
       ],
     });
@@ -193,7 +274,7 @@ router.get("/getClass/:id", checkAuth, async (req, res) => {
 
 // Route to add a new class
 router.post("/addClass", async (req, res) => {
-    const { class_name, level_id, department_id, start_date, end_date, note, schedules, teachers } = req.body;
+    const { class_name, level_id, department_id, start_date, end_date, note, schedules, teachers, students } = req.body;
     console.log(req.body)
     const conn = await db.getConnection();
     try {
@@ -224,6 +305,15 @@ router.post("/addClass", async (req, res) => {
         await conn.query(
           "INSERT INTO class_teacher (class_id, teacher_id) VALUES (?, ?)",
           [class_id, teacher_id]
+        );
+      }
+  
+      console.log("Insert into class_students table")
+      // Insert into class_students
+      for (const student_id of students) {
+        await conn.query(
+          "INSERT INTO class_students (class_id, student_id) VALUES (?, ?)",
+          [class_id, student_id]
         );
       }
   

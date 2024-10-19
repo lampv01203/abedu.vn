@@ -10,6 +10,7 @@ router.get("/students", checkAuth, async (req, res) => {
   try {
     const user = req.session.user;
 
+    const paramClassId = req.query.class_id;
     const paramLevelId = req.query.level_id;
     const paramDepartmentId = req.query.department_id;
 
@@ -38,7 +39,7 @@ router.get("/students", checkAuth, async (req, res) => {
             AND (:userDepartmentId = 1 OR s.department_id = :userDepartmentId)
             AND cs.del_flg = 0
             AND cs.queue_flag = 1
-            AND cs.class_id is NULL
+            AND (cs.class_id is NULL OR (:paramClassId is not NULL AND cs.class_id = :paramClassId))
             AND l.del_flg = 0
             AND l.level_id = :paramLevelId
             AND (:paramDepartmentId = 1 OR s.department_id = :paramDepartmentId)
@@ -48,13 +49,14 @@ router.get("/students", checkAuth, async (req, res) => {
       {
         replacements: {
           userDepartmentId,
+          paramClassId,
           paramLevelId,
           paramDepartmentId,
         },
         type: Student.sequelize.QueryTypes.SELECT,
       }
     );
-
+    console.log("rounter student by level + department ", students)
     res.json(students);
   } catch (error) {
     console.error("Lỗi khi lấy danh sách học sinh theo cấp độ:", error);

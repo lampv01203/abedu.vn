@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 
-const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStudents }) => {
+const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSelectedStudents }) => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]); // Dữ liệu sau khi lọc
   const [filters, setFilters] = useState({
@@ -20,11 +20,21 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
       if ((levelId && departmentId)) {
         try {
           const response = await axios.get("/api/students", {
-            params: { level_id: levelId, department_id: departmentId },
+            params: { class_id: classId, level_id: levelId, department_id: departmentId },
           });
           setStudents(response.data); // Lưu danh sách học sinh
           setFilteredStudents(response.data);
-        } catch (error) {
+        // Tự động chọn các học sinh đã có trong lớp
+        const selectedIds = selectedStudents || []; // Đảm bảo selectedStudents không bị null
+        const autoSelectedStudents = response.data
+          .filter((student) => selectedIds.includes(student.student_id))
+          .map((student) => student.student_id);
+
+        // Chỉ cập nhật nếu có thay đổi
+        if (JSON.stringify(autoSelectedStudents) !== JSON.stringify(selectedStudents)) {
+          setSelectedStudents(autoSelectedStudents); // Set trạng thái các học sinh đã chọn
+        }
+      } catch (error) {
           console.error("Error fetching students", error);
         }
       } else {
@@ -33,7 +43,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
     };
 
     fetchStudents();
-  }, [levelId, departmentId]);
+  }, [levelId, departmentId, setSelectedStudents]);
 
   // Hàm để thêm hoặc loại bỏ học sinh khỏi danh sách
   const toggleStudent = (student_id) => {
@@ -94,6 +104,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.fullName}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo tên"
+                  autoComplete="name"
                 />
               </th>
               <th className="w-110">
@@ -105,6 +116,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.birthday}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo năm"
+                  autoComplete="birthday"
                 />
               </th>
               <th className="w-110">
@@ -116,6 +128,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.phone}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo SĐT"
+                  autoComplete="phone"
                 />
               </th>
               <th className="w-150">
@@ -127,6 +140,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.facebook}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo Facebook"
+                  autoComplete="facebook"
                 />
               </th>
               <th className="w-110">
@@ -138,6 +152,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.departmentCode}
                   onChange={handleFilterChange}
                   placeholder="Lọc cơ sở"
+                  autoComplete="off"
                 />
               </th>
               <th>
@@ -149,6 +164,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                   value={filters.note}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo ghi chú"
+                  autoComplete="note"
                 />
               </th>
             </tr>
@@ -169,7 +185,7 @@ const StudentSelect = ({ levelId, departmentId, selectedStudents, setSelectedStu
                       {isSelected ? "-" : "+"}
                     </button>
                   </td>
-                  <td>{student.full_name}</td>
+                  <td >{student.full_name}</td>
                   <td className="w-center">
                     {format(new Date(student.birthday), "dd/MM/yyyy")}
                   </td>

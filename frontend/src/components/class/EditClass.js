@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import TeacherSelect from "./TeacherSelect"; 
-import StudentSelect from "./StudentSelect"; 
+import TeacherSelect from "./TeacherSelect";
+import StudentSelect from "./StudentSelect";
 
 const EditClass = () => {
   const { classId } = useParams(); // Lấy classId từ URL
@@ -24,24 +24,41 @@ const EditClass = () => {
   const [departments, setDepartments] = useState([]);
   const [workingDays, setWorkingDays] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [classSchedules, setClassSchedules] = useState([]);
+  const [classTeachers, setClassTeachers] = useState([]);
+  const [classStudents, setClassStudents] = useState([]);
 
   // Fetch levels, departments, teachers and class data for editing
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [levelRes, departmentRes, workingDayRes, teacherRes, classRes] =
-          await Promise.all([
-            axios.get("/api/levels"),
-            axios.get("/api/departments"),
-            axios.get("/api/workingDays"),
-            axios.get("/api/teachers"),
-            axios.get(`/api/classes/${classId}`), // Fetch class data for editing
-          ]);
+        const [
+          classRes,
+          levelRes,
+          departmentRes,
+          workingDayRes,
+          classScheduleRes,
+          teacherRes,
+          classTeacherRes,
+          classStudentRes,
+        ] = await Promise.all([
+          axios.get(`/api/getClass/${classId}`), // Fetch class data for editing
+          axios.get("/api/levels"),
+          axios.get("/api/departments"),
+          axios.get("/api/workingDays"),
+          axios.get(`/api/classSchedule/${classId}`), // Fetch class_schedule data for editing
+          axios.get("/api/teachers"),
+          axios.get(`/api/classTeacher/${classId}`), // Fetch class teacher data for editing
+          axios.get(`/api/classStudent/${classId}`), // Fetch class student data for editing
+        ]);
+        setClassData(classRes.data); // Set class data to form fields
         setLevels(levelRes.data);
         setDepartments(departmentRes.data);
         setWorkingDays(workingDayRes.data);
+        setClassSchedules(classScheduleRes.data); // Set class_schedule data to form fields
         setTeachers(teacherRes.data);
-        setClassData(classRes.data); // Set class data to form fields
+        setClassTeachers(classTeacherRes.data); // Set class_teacher data to form fields
+        setClassStudents(classStudentRes.data); // Set class_student data to form fields
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -57,27 +74,24 @@ const EditClass = () => {
 
   // Handle schedule changes
   const handleScheduleChange = (index, field, value) => {
-    const newSchedules = classData.schedules.map((schedule, i) =>
+    const newSchedules = classSchedules.map((schedule, i) =>
       i === index ? { ...schedule, [field]: value } : schedule
     );
-    setClassData({ ...classData, schedules: newSchedules });
+    setClassSchedules(newSchedules);
   };
 
   // Add a new schedule row
   const addSchedule = () => {
-    setClassData({
-      ...classData,
-      schedules: [
-        ...classData.schedules,
-        { day_of_week: "", start_time: "", end_time: "" },
-      ],
-    });
+    setClassSchedules([
+      ...classSchedules,
+      { day_of_week: "", start_time: "", end_time: "" },
+    ]);
   };
 
   // Remove schedule row
   const removeSchedule = (index) => {
-    const newSchedules = classData.schedules.filter((_, i) => i !== index);
-    setClassData({ ...classData, schedules: newSchedules });
+    const newSchedules = classSchedules.filter((_, i) => i !== index);
+    setClassSchedules(newSchedules);
   };
 
   // Handle teacher selection
@@ -88,11 +102,23 @@ const EditClass = () => {
     }));
   };
 
+  // Định nghĩa setSelectedStudents
+  const setSelectedStudents = (students) => {
+    setClassData((prevData) => ({
+      ...prevData,
+      students: students,
+    }));
+  };
+
   // Handle form submission for editing class
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/updateClass/${classId}`, classData); // Update class API
+      // Gửi dữ liệu classData và classSchedules về API
+      await axios.put(`/api/updateClass/${classId}`, {
+        ...classData,
+        schedules: classSchedules,
+      }); // Update class API
       navigate("/classlist"); // Navigate back to the class list page
     } catch (error) {
       console.error("Error submitting form", error);
@@ -121,6 +147,7 @@ const EditClass = () => {
                 value={classData.class_name}
                 onChange={handleChange}
                 required
+                autoComplete="class-name" // Thêm thuộc tính này
               />
             </div>
           </div>
@@ -138,6 +165,7 @@ const EditClass = () => {
                 value={classData.level_id}
                 onChange={handleChange}
                 required
+                autoComplete="level-id" // Thêm thuộc tính này
               >
                 <option value="">Chọn Cấp Độ</option>
                 {levels.map((level) => (
@@ -162,6 +190,7 @@ const EditClass = () => {
                 value={classData.department_id}
                 onChange={handleChange}
                 required
+                autoComplete="department-id" // Thêm thuộc tính này
               >
                 <option value="">Chọn Cơ Sở</option>
                 {departments.map((department) => (
@@ -182,7 +211,7 @@ const EditClass = () => {
               Lịch Học
             </label>
             <div className="col-sm-9">
-              {classData.schedules.map((schedule, index) => (
+              {classSchedules.map((schedule, index) => (
                 <div key={index} className="row mb-2">
                   <div className="col-sm-3">
                     <select
@@ -196,6 +225,7 @@ const EditClass = () => {
                           e.target.value
                         )
                       }
+                      autoComplete="off" // Hoặc giá trị phù hợp khác
                       required
                     >
                       <option value="">Chọn Thứ</option>
@@ -218,6 +248,7 @@ const EditClass = () => {
                           e.target.value
                         )
                       }
+                      autoComplete="start-time" // Thêm thuộc tính này
                       required
                     />
                   </div>
@@ -229,6 +260,7 @@ const EditClass = () => {
                       onChange={(e) =>
                         handleScheduleChange(index, "end_time", e.target.value)
                       }
+                      autoComplete="end-time" // Thêm thuộc tính này
                       required
                     />
                   </div>
@@ -266,6 +298,7 @@ const EditClass = () => {
                 name="start_date"
                 value={classData.start_date}
                 onChange={handleChange}
+                autoComplete="start-date" // Thêm thuộc tính này
               />
             </div>
           </div>
@@ -283,6 +316,7 @@ const EditClass = () => {
                 name="end_date"
                 value={classData.end_date}
                 onChange={handleChange}
+                autoComplete="end-date" // Thêm thuộc tính này
               />
             </div>
           </div>
@@ -299,6 +333,7 @@ const EditClass = () => {
                 name="note"
                 value={classData.note}
                 onChange={handleChange}
+                autoComplete="note" // Thêm thuộc tính này
               />
             </div>
           </div>
@@ -311,27 +346,20 @@ const EditClass = () => {
             <div className="col-sm-9">
               <TeacherSelect
                 teachers={teachers}
-                selectedTeachers={classData.teachers}
-                onChange={setSelectedTeachers}
-              />
-            </div>
-          </div>
-
-          {/* Student Select */}
-          <div className="form-group row">
-            <label htmlFor="students" className="col-sm-3 col-form-label">
-              Học Sinh
-            </label>
-            <div className="col-sm-9">
-              <StudentSelect
-                selectedStudents={classData.students}
-                onChange={(students) =>
-                  setClassData({ ...classData, students: students })
-                }
+                selectedTeachers={classTeachers.map((t) => t.teacher_id)} // Danh sách giáo viên đã chọn
+                setSelectedTeachers={setSelectedTeachers}
               />
             </div>
           </div>
         </div>
+        {/* Student Select */}
+        <StudentSelect
+          classId={classId}
+          levelId={classData.level_id}
+          departmentId={classData.department_id}
+          selectedStudents={classStudents.map((student) => student.student_id)} // Sửa lại để truyền danh sách học sinh đã liên kết với lớp
+          setSelectedStudents={setSelectedStudents} // Truyền hàm vừa định nghĩa
+        />
 
         <div className="card-footer">
           <button type="submit" className="btn btn-primary">

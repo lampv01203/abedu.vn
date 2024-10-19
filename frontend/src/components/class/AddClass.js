@@ -84,6 +84,14 @@ const AddClass = () => {
     }));
   };
 
+  // Định nghĩa setSelectedStudents
+  const setSelectedStudents = (selectedStudents) => {
+    setClassData((prevData) => ({
+      ...prevData,
+      students: selectedStudents,
+    }));
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -192,6 +200,7 @@ const AddClass = () => {
                           e.target.value
                         )
                       }
+                      autoComplete="workingDays"
                       required
                     >
                       <option value="">Chọn Thứ</option>
@@ -214,6 +223,7 @@ const AddClass = () => {
                           e.target.value
                         )
                       }
+                      autoComplete="start_time"
                       required
                     />
                   </div>
@@ -225,6 +235,7 @@ const AddClass = () => {
                       onChange={(e) =>
                         handleScheduleChange(index, "end_time", e.target.value)
                       }
+                      autoComplete="end_time"
                       required
                     />
                   </div>
@@ -233,6 +244,7 @@ const AddClass = () => {
                       type="button"
                       className="btn btn-danger"
                       onClick={() => removeSchedule(index)}
+                      autoComplete="off"
                     >
                       X
                     </button>
@@ -243,6 +255,7 @@ const AddClass = () => {
                 type="button"
                 className="btn btn-secondary"
                 onClick={addSchedule}
+                autoComplete="off"
               >
                 + Thêm lịch học
               </button>
@@ -318,9 +331,7 @@ const AddClass = () => {
           levelId={classData.level_id}
           departmentId={classData.department_id}
           selectedStudents={classData.students}
-          setSelectedStudents={(students) =>
-            setClassData({ ...classData, students })
-          }
+          setSelectedStudents={setSelectedStudents} // Truyền hàm vừa định nghĩa
         />
         {/* Submit Button */}
         <div className="card-footer">

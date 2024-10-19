@@ -60,7 +60,7 @@ const App = () => {
             {/* Class component */}
             <Route path="classList" element={<WithAuth><ClassList /></WithAuth>} />
             <Route path="addclass" element={<WithAuth><AddClass /></WithAuth>} />
-            <Route path="editclass" element={<WithAuth><EditClass /></WithAuth>} />
+            <Route path="editclass/:classId" element={<WithAuth><EditClass /></WithAuth>} />
 
             {/* Route được bảo vệ thêm với WithAdmin */}
             <Route path="levellist" element={<WithAdmin><LevelList /></WithAdmin>} />

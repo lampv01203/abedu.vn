@@ -39,7 +39,7 @@ app.use('/api', departmentRoutes); // Kết nối route chi nhánh
 app.use('/api', levelRoutes); // Kết nối route level
 app.use('/api', classRoutes); // Kết nối route
 
-
+// npm run dev
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
