@@ -204,7 +204,7 @@ const TopScreen = () => {
       {/* Main Content */}
       <main className="app-main">
         {/* Outlet hiển thị các component con */}
-        <Outlet />
+        <Outlet context={{ user }} /> {/* Truyền user như context */}
       </main>
       <footer className="main-footer">
         <div className="float-right d-none d-sm-block">

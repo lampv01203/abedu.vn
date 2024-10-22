@@ -1,10 +1,12 @@
 // frontend/src/components/teacher/EditTeacher.js
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Sử dụng useParams để lấy ID giáo viên
+import { useNavigate, useParams, useOutletContext } from "react-router-dom"; // Sử dụng useParams để lấy ID giáo viên
 import axios from "axios";
 import { format } from "date-fns";
+import UserRole from '../../UserRole';
 
 const EditTeacher = () => {
+  const { user } = useOutletContext(); // Lấy user từ context
   const navigate = useNavigate();
   const { id } = useParams(); // Lấy ID từ URL
   const [departments, setDepartments] = useState([]);
@@ -34,6 +36,13 @@ const EditTeacher = () => {
     };
 
     fetchDepartments();
+    // Lấy thông tin người dùng từ localStorage
+    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+      setTeacher((prevData) => ({
+        ...prevData,
+        department_id: user.department_id, // Gán department_id mặc định
+      }));
+    }
   }, [navigate]);
 
   // Lấy thông tin giáo viên từ API
@@ -171,6 +180,9 @@ const EditTeacher = () => {
                 value={teacher.department_id || ""}
                 onChange={handleChange}
                 required
+                disabled={
+                  user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true
+                } // Disable cho các vai trò không phải ADMIN hoặc SYSTEM
               >
                 <option value="">Chọn chi nhánh</option>
                 {departments.map(department => (

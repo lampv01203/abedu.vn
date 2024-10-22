@@ -1,9 +1,11 @@
 // frontend/src/components/AddStudent.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useHistory
+import { useNavigate, useOutletContext } from 'react-router-dom'; // Import useHistory
 import axios from 'axios';
+import UserRole from '../../UserRole';
 
 const AddStudent = () => {
+  const { user } = useOutletContext(); // Lấy user từ context
   const navigate = useNavigate(); // Khởi tạo useNavigate
   const [departments, setDepartments] = useState([]);
   const [formData, setFormData] = useState({
@@ -31,6 +33,13 @@ const AddStudent = () => {
     };
 
     fetchDepartments();
+    // Lấy thông tin người dùng từ localStorage
+    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+      setFormData((prevData) => ({
+        ...prevData,
+        department_id: user.department_id, // Gán department_id mặc định
+      }));
+    }
   }, []);
 
   const handleChange = (e) => {
@@ -139,6 +148,9 @@ const AddStudent = () => {
               value={formData.department_id}
               onChange={handleChange}
               required
+              disabled={
+                user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true
+              } // Disable cho các vai trò không phải ADMIN hoặc SYSTEM
             >
               <option value="">Chọn chi nhánh</option>
               {departments.map(department => (

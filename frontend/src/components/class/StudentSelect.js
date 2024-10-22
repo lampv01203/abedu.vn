@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 
-const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSelectedStudents }) => {
+const StudentSelect = ({
+  classId,
+  levelId,
+  departmentId,
+  selectedStudents,
+  setSelectedStudents,
+}) => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]); // Dữ liệu sau khi lọc
   const [filters, setFilters] = useState({
-    fullName: "",
+    full_Name: "",
     birthday: "",
     phone: "",
     facebook: "",
@@ -14,27 +20,24 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
     note: "",
   });
 
-  // Fetch students when levelId changes
+  // useRef để ngăn việc gọi lại API khi không cần thiết
+  const initialFetch = useRef(true);
+
+  // Fetch students when levelId or departmentId changes
   useEffect(() => {
     const fetchStudents = async () => {
-      if ((levelId && departmentId)) {
+      if (levelId && departmentId) {
         try {
           const response = await axios.get("/api/students", {
-            params: { class_id: classId, level_id: levelId, department_id: departmentId },
+            params: {
+              class_id: classId || "",
+              level_id: levelId,
+              department_id: departmentId,
+            },
           });
           setStudents(response.data); // Lưu danh sách học sinh
           setFilteredStudents(response.data);
-        // Tự động chọn các học sinh đã có trong lớp
-        const selectedIds = selectedStudents || []; // Đảm bảo selectedStudents không bị null
-        const autoSelectedStudents = response.data
-          .filter((student) => selectedIds.includes(student.student_id))
-          .map((student) => student.student_id);
-
-        // Chỉ cập nhật nếu có thay đổi
-        if (JSON.stringify(autoSelectedStudents) !== JSON.stringify(selectedStudents)) {
-          setSelectedStudents(autoSelectedStudents); // Set trạng thái các học sinh đã chọn
-        }
-      } catch (error) {
+        } catch (error) {
           console.error("Error fetching students", error);
         }
       } else {
@@ -42,8 +45,31 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
       }
     };
 
+    // if (initialFetch.current || (levelId && departmentId)) {
+    //   initialFetch.current = false; // Đảm bảo chỉ gọi fetch khi cần
+    //   fetchStudents();
+    // }
     fetchStudents();
-  }, [levelId, departmentId, setSelectedStudents]);
+  }, [classId, levelId, departmentId]); // Chỉ theo dõi các dependency cần thiết
+
+  // useEffect(() => {
+  //   const selectedIds = selectedStudents || [];
+  //   console.log('Selected IDs:', selectedIds);
+  //   console.log('Students:', students);
+
+  //   const autoSelectedStudents = students
+  //     .filter((student) => selectedIds.includes(student.student_id))
+  //     .map((student) => student.student_id);
+
+  //   console.log('Auto-selected Students:', autoSelectedStudents);
+
+  //   // Chỉ cập nhật nếu có thay đổi
+  //   if (
+  //     JSON.stringify(autoSelectedStudents) !== JSON.stringify(selectedStudents)
+  //   ) {
+  //     setSelectedStudents(autoSelectedStudents);
+  //   }
+  // }, [students, selectedStudents, setSelectedStudents]);
 
   // Hàm để thêm hoặc loại bỏ học sinh khỏi danh sách
   const toggleStudent = (student_id) => {
@@ -61,7 +87,7 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
       (student) =>
         (student.full_name || "")
           .toLowerCase()
-          .includes(filters.fullName.toLowerCase()) &&
+          .includes(filters.full_Name.toLowerCase()) &&
         (student.birthday || "").includes(filters.birthday) &&
         (student.phone || "").includes(filters.phone) &&
         (student.facebook || "")
@@ -98,10 +124,11 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th className="w-180">
                 Họ và tên
                 <input
+                  id="filterFullName"
                   className="w-100-per w-180"
                   type="text"
-                  name="fullName"
-                  value={filters.fullName}
+                  name="full_Name"
+                  value={filters.full_Name}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo tên"
                   autoComplete="name"
@@ -110,6 +137,7 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th className="w-110">
                 Năm sinh
                 <input
+                  id="filterBirthday"
                   className="w-center w-110"
                   type="text"
                   name="birthday"
@@ -122,6 +150,7 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th className="w-110">
                 Sdt
                 <input
+                  id="filterPhone"
                   className="w-center w-110"
                   type="text"
                   name="phone"
@@ -134,6 +163,7 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th className="w-150">
                 Facebook
                 <input
+                  id="filterFacebook"
                   className="w-150"
                   type="text"
                   name="facebook"
@@ -146,10 +176,11 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th className="w-110">
                 Cơ sở
                 <input
+                  id="filterDepartmentCode"
                   className="w-center w-110"
                   type="text"
-                  name="departmentCode"
-                  value={filters.departmentCode}
+                  name="department_code"
+                  value={filters.department_code}
                   onChange={handleFilterChange}
                   placeholder="Lọc cơ sở"
                   autoComplete="off"
@@ -158,6 +189,7 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               <th>
                 Note
                 <input
+                  id="filterNote"
                   className="w-100per"
                   type="text"
                   name="note"
@@ -174,18 +206,15 @@ const StudentSelect = ({classId, levelId, departmentId, selectedStudents, setSel
               const isSelected = selectedStudents.includes(student.student_id);
               return (
                 <tr key={student.student_id}>
-                  <td>
-                    <button
-                      type="button"
-                      className={`btn ${
-                        isSelected ? "btn-danger" : "btn-success"
-                      }`}
-                      onClick={() => toggleStudent(student.student_id)}
-                    >
-                      {isSelected ? "-" : "+"}
-                    </button>
+                  <td className="w-70 w-center">
+                    <input
+                      id={`student_id_${student.student_id}`}
+                      type="checkbox"
+                      checked={selectedStudents.includes(student.student_id)}
+                      onChange={() => toggleStudent(student.student_id)}
+                    />
                   </td>
-                  <td >{student.full_name}</td>
+                  <td>{student.full_name}</td>
                   <td className="w-center">
                     {format(new Date(student.birthday), "dd/MM/yyyy")}
                   </td>

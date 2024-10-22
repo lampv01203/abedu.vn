@@ -18,7 +18,7 @@ const TeacherSelect = ({ teachers, selectedTeachers, setSelectedTeachers }) => {
         allowClear: true,
       })
       .val(selectedTeachers) // Thiết lập giá trị ban đầu từ selectedTeachers
-      .trigger("change", handleChange);
+      .trigger("change");
 
     // Lắng nghe sự kiện thay đổi để cập nhật giá trị khi user chọn
     $(selectRef.current).on("change", handleChange);
@@ -32,6 +32,7 @@ const TeacherSelect = ({ teachers, selectedTeachers, setSelectedTeachers }) => {
   return (
     <select
       id="teachers"
+      name="teachers" 
       ref={selectRef}
       className="select2 select2bs4"
       multiple

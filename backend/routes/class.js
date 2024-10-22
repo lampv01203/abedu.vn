@@ -77,11 +77,12 @@ router.get("/classSchedule/:id", checkAuth, async (req, res) => {
     console.log(req.params.id)
     const paramClassId = req.params.id
     const classSchedule = await Class.sequelize.query(`
-      SELECT 
-            wd.day_of_week, 
-            wd.start_time, 
-            wd.end_time,
-            wd.is_temporary
+      SELECT
+          wd.id, 
+          wd.day_of_week, 
+          wd.start_time, 
+          wd.end_time,
+          wd.is_temporary
         FROM 
           class_schedule wd
         INNER JOIN
@@ -331,20 +332,104 @@ router.post("/addClass", async (req, res) => {
     }
   });
 
-// Route để cập nhật thông tin lớp học
-router.put("/updateClass/:id", checkAuth, async (req, res) => {
+// Route to update an existing class
+router.put("/updateClass/:class_id", async (req, res) => {
+  const { class_id } = req.params;
+  const { class_name, level_id, department_id, start_date, end_date, note, schedules, teachers, students } = req.body;
+  
+  const conn = await db.getConnection();
   try {
-    const classInfo = await Class.findByPk(req.params.id);
+    console.log("Start transaction");
+    // Start transaction
+    await conn.beginTransaction();
 
-    if (!classInfo)
-      return res.status(404).json({ message: "Lớp học không tồn tại" });
+    console.log("Update class table");
+    // Update class table
+    await conn.query(
+      "UPDATE class SET class_name = ?, level_id = ?, department_id = ?, start_date = ?, end_date = ?, note = ? WHERE class_id = ?",
+      [class_name, level_id, department_id, start_date, end_date, note, class_id]
+    );
 
-    await classInfo.update(req.body); // Cập nhật thông tin lớp học
+    console.log("Update class_schedule table");
+    // Update class_schedule
+    for (const schedule of schedules) {
+      if (schedule.id) {
+        // Update existing schedule
+        await conn.query(
+          "UPDATE class_schedule SET day_of_week = ?, start_time = ?, end_time = ? WHERE id = ?",
+          [schedule.day_of_week, schedule.start_time, schedule.end_time, schedule.id]
+        );
+      } else {
+        // Insert new schedule if id is null or blank
+        await conn.query(
+          "INSERT INTO class_schedule (class_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?)",
+          [class_id, schedule.day_of_week, schedule.start_time, schedule.end_time]
+        );
+      }
+    }
 
-    res.status(200).json({ message: "Cập nhật lớp học thành công" });
-  } catch (error) {
-    console.error("Lỗi khi cập nhật lớp học", error);
-    res.status(500).json({ message: "Lỗi server" });
+    console.log("Update class_teacher table");
+    // Get existing teacher_ids for the class
+    const [existingTeachers] = await conn.query(
+      "SELECT teacher_id FROM class_teacher WHERE class_id = ?",
+      [class_id]
+    );
+    const existingTeacherIds = existingTeachers.map(t => t.teacher_id);
+
+    // Delete teachers not in the new list
+    const teachersToDelete = existingTeacherIds.filter(id => !teachers.includes(id));
+    if (teachersToDelete.length > 0) {
+      await conn.query(
+        "DELETE FROM class_teacher WHERE class_id = ? AND teacher_id IN (?)",
+        [class_id, teachersToDelete]
+      );
+    }
+
+    // Insert new teachers
+    const teachersToInsert = teachers.filter(id => !existingTeacherIds.includes(id));
+    for (const teacher_id of teachersToInsert) {
+      await conn.query(
+        "INSERT INTO class_teacher (class_id, teacher_id) VALUES (?, ?)",
+        [class_id, teacher_id]
+      );
+    }
+
+    console.log("Update class_students table");
+    // Get existing student_ids for the class
+    const [existingStudents] = await conn.query(
+      "SELECT student_id FROM class_students WHERE class_id = ?",
+      [class_id]
+    );
+    const existingStudentIds = existingStudents.map(s => s.student_id);
+
+    // Delete students not in the new list
+    const studentsToDelete = existingStudentIds.filter(id => !students.includes(id));
+    if (studentsToDelete.length > 0) {
+      await conn.query(
+        "DELETE FROM class_students WHERE class_id = ? AND student_id IN (?)",
+        [class_id, studentsToDelete]
+      );
+    }
+
+    // Insert new students
+    const studentsToInsert = students.filter(id => !existingStudentIds.includes(id));
+    for (const student_id of studentsToInsert) {
+      await conn.query(
+        "INSERT INTO class_students (class_id, student_id) VALUES (?, ?)",
+        [class_id, student_id]
+      );
+    }
+
+    console.log("Commit transaction");
+    // Commit transaction
+    await conn.commit();
+    res.status(200).json({ message: "Class updated successfully!" });
+  } catch (err) {
+    // Rollback transaction in case of error
+    await conn.rollback();
+    res.status(500).json({ error: err.message });
+  } finally {
+    conn.release();
   }
 });
 

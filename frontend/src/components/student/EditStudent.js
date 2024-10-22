@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Sử dụng useParams để lấy ID học sinh
+import { useNavigate, useParams, useOutletContext } from "react-router-dom"; // Sử dụng useParams để lấy ID học sinh
 import axios from "axios";
 import { format } from "date-fns";
+import UserRole from '../../UserRole';
 
 const EditStudent = () => {
   const navigate = useNavigate();
@@ -32,6 +33,13 @@ const EditStudent = () => {
     };
 
     fetchDepartments();
+    // Lấy thông tin người dùng từ localStorage
+    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+      setStudent((prevData) => ({
+        ...prevData,
+        department_id: user.department_id, // Gán department_id mặc định
+      }));
+    }
   }, []);
 
   // Lấy thông tin học sinh từ API
@@ -144,7 +152,7 @@ const EditStudent = () => {
 
           {/* Trung tâm */}
           <div className="form-group row">
-            <label htmlFor="department_id" className="col-sm-3 col-form-label">Trung tâm</label>
+            <label htmlFor="department_id" className="col-sm-3 col-form-label">Chi nhánh</label>
             <div className="col-sm-9">
             <select
               className="form-control"
@@ -153,6 +161,9 @@ const EditStudent = () => {
               value={student.department_id || ""}
               onChange={handleChange}
               required
+              disabled={
+                user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true
+              } // Disable cho các vai trò không phải ADMIN hoặc SYSTEM
             >
               <option value="">Chọn chi nhánh</option>
               {departments.map(department => (

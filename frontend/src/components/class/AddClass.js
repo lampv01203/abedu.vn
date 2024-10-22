@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import TeacherSelect from "./TeacherSelect"; // Import TeacherSelect
 import StudentSelect from "./StudentSelect"; // Import StudentSelect
+import UserRole from '../../UserRole';
 
 const AddClass = () => {
   const navigate = useNavigate();
+  const { user } = useOutletContext(); // Lấy user từ context
 
   const [classData, setClassData] = useState({
     class_name: "",
@@ -44,6 +46,13 @@ const AddClass = () => {
       }
     };
     fetchData();
+    // Lấy thông tin người dùng từ localStorage
+    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+      setClassData((prevData) => ({
+        ...prevData,
+        department_id: user.department_id, // Gán department_id mặc định
+      }));
+    }
   }, []);
 
   // Handle form input changes
@@ -156,7 +165,7 @@ const AddClass = () => {
           {/* Department */}
           <div className="form-group row">
             <label htmlFor="department_id" className="col-sm-3 col-form-label">
-              Cơ Sở
+              Chi nhánh
             </label>
             <div className="col-sm-5">
               <select
@@ -166,8 +175,11 @@ const AddClass = () => {
                 value={classData.department_id}
                 onChange={handleChange}
                 required
+                disabled={
+                  user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true
+                } // Disable cho các vai trò không phải ADMIN hoặc SYSTEM
               >
-                <option value="">Chọn Cơ Sở</option>
+                <option value="">Chọn Chi nhánh</option>
                 {departments.map((department) => (
                   <option
                     key={department.department_id}
@@ -182,15 +194,15 @@ const AddClass = () => {
 
           {/* Schedules */}
           <div className="form-group row">
-            <label htmlFor="workingDays" className="col-sm-3 col-form-label">
+            <div htmlFor="workingDays" className="col-sm-3 font-weight-bold">
               Lịch Học
-            </label>
+            </div>
             <div className="col-sm-9">
               {classData.schedules.map((schedule, index) => (
                 <div key={index} className="row mb-2">
                   <div className="col-sm-3">
                     <select
-                      id="workingDays"
+                      id={`workingDays-${index}`}
                       className="form-control"
                       value={schedule.day_of_week}
                       onChange={(e) =>
@@ -213,6 +225,7 @@ const AddClass = () => {
                   </div>
                   <div className="col-sm-4">
                     <input
+                      id={`startTime-${index}`}
                       type="time"
                       className="form-control"
                       value={schedule.start_time}
@@ -229,6 +242,7 @@ const AddClass = () => {
                   </div>
                   <div className="col-sm-4">
                     <input
+                      id={`endTime-${index}`}
                       type="time"
                       className="form-control"
                       value={schedule.end_time}

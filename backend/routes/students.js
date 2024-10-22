@@ -56,7 +56,6 @@ router.get("/students", checkAuth, async (req, res) => {
         type: Student.sequelize.QueryTypes.SELECT,
       }
     );
-    console.log("rounter student by level + department ", students)
     res.json(students);
   } catch (error) {
     console.error("Lỗi khi lấy danh sách học sinh theo cấp độ:", error);
