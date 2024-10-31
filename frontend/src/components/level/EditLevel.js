@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // Sử dụng useParams để lấy ID cấp độ
 import { NumericFormat } from "react-number-format";
 import axios from "axios";
+import Toast from "../toast";
 
 const EditLevel = () => {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ const EditLevel = () => {
         const response = await axios.get(`/api/getLevel/${id}`);
         setLevel(response.data);
       } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error("Lỗi khi lấy thông tin cấp độ", error);
       }
     };
@@ -39,8 +44,16 @@ const EditLevel = () => {
     e.preventDefault();
     try {
       await axios.put(`/api/updateLevel/${id}`, level); // Gọi API để cập nhật cấp độ học
+      Toast.fire({
+        icon: "success",
+        title: "Thay đổi thông tin cấp độ học thành công!",
+      });
       navigate("/levellist"); // Chuyển hướng về danh sách cấp độ
     } catch (error) {
+      Toast.fire({
+        icon: "error",
+        title: "Thay đổi thông tin cấp độ học thất bại",
+      });
       console.error("Lỗi khi cập nhật cấp độ học", error);
     }
   };

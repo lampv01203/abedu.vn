@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import Toast from "../toast";
 
 const ClassList = () => {
   const [classes, setClasses] = useState([]); // Dữ liệu lớp học
@@ -30,6 +31,10 @@ const ClassList = () => {
         setFilteredClasses(classesData);
       })
       .catch((error) => {
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error("Error fetching classes:", error);
       });
   }, []);

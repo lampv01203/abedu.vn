@@ -4,6 +4,7 @@ import { useNavigate, useParams, useOutletContext } from "react-router-dom";
 import TeacherSelect from "./TeacherSelect";
 import StudentSelect from "./StudentSelect";
 import UserRole from '../../UserRole';
+import Toast from "../toast";
 
 const EditClass = () => {
   const { classId } = useParams(); // Lấy classId từ URL
@@ -19,7 +20,7 @@ const EditClass = () => {
     note: "",
     teachers: [],
     students: [],
-    schedules: [{ id: "", day_of_week: "", start_time: "", end_time: "" }],
+    schedules: [{ schedule_id: "", day_of_week: "", start_time: "", end_time: "" }],
   });
 
   const [levels, setLevels] = useState([]);
@@ -53,6 +54,9 @@ const EditClass = () => {
         ]);
         setClassData({
           ...classRes.data,
+          start_date: classRes.data.start_date || "",
+          end_date: classRes.data.end_date || "",
+          note: classRes.data.note || "",
           schedules: classScheduleRes.data,
           teachers: classTeacherRes.data.map((t) => t.teacher_id), // Giáo viên
           students: classStudentRes.data.map((s) => s.student_id), // Cập nhật học sinh vào classData
@@ -96,7 +100,7 @@ const EditClass = () => {
   const addSchedule = () => {
     setClassSchedules([
       ...classSchedules,
-      { id: "", day_of_week: "", start_time: "", end_time: "" },
+      { schedule_id: "", day_of_week: "", start_time: "", end_time: "" },
     ]);
   };
 
@@ -131,9 +135,17 @@ const EditClass = () => {
         ...classData,
         schedules: classSchedules,
       }); // Update class API
+      Toast.fire({
+        icon: "success",
+        title: "Thay đổi thông tin lớp thành công!",
+      });
       navigate("/classlist"); // Navigate back to the class list page
     } catch (error) {
-      console.error("Error submitting form", error);
+      Toast.fire({
+        icon: "error",
+        title: "Thay đổi thông tin lớp thất bại",
+      });
+      console.error("Thay đổi thông tin lớp thất bại", error);
     }
   };
 

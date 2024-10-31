@@ -5,3 +5,11 @@
 .font-weight-bold {
     font-weight: 700 !important;
   }
+
+.input-group-prepend { margin-right: -2px; }
+.input-group-append { margin-left: -2px; }
+
+.custom-modal-width {
+  width: 50%;
+  max-width: 60%;
+}

@@ -8,6 +8,21 @@ const Department = require("../models/Department");
 const WorkingDay = require("../models/WorkingDay");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 const db = require("../config/db");
+const wd = require("../models/WorkingDay"); // Import Sequelize model
+
+// API lấy thông tin cấp độ theo ID
+router.get("/getWorkingDay/:id", async (req, res) => {
+  try {
+    const workingDay = await wd.findByPk(req.params.id);
+    if (!workingDay) {
+      return res.status(404).json({ message: "Working Day không tồn tại" });
+    }
+    res.json(workingDay);
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin Working Day", error);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
 
 router.get("/workingDays", checkAuth, async (req, res) => {
   try {
@@ -26,12 +41,16 @@ router.get("/classTeacher/:id", checkAuth, async (req, res) => {
     const paramClassId = req.params.id
     const classTeacher = await Class.sequelize.query(`
       SELECT 
-            teacher_id
+            t.teacher_id,
+            t.full_name
         FROM 
-          class_teacher
+          class_teacher ct
+        INNER JOIN 
+          teacher t ON ct.teacher_id = t.teacher_id
         WHERE
-          del_flg = 0
-          AND class_id = :paramClassId
+          ct.del_flg = 0
+          AND t.del_flg = 0
+          AND ct.class_id = :paramClassId
       `,
       {
         replacements: {
@@ -52,12 +71,16 @@ router.get("/classStudent/:id", checkAuth, async (req, res) => {
     const paramClassId = req.params.id
     const classStudent = await Class.sequelize.query(`
       SELECT 
-            student_id
+            s.student_id,
+            s.full_name
         FROM 
-          class_students
+          class_students cs
+        INNER JOIN
+          students s ON cs.student_id = s.student_id
         WHERE
-          del_flg = 0
-          AND class_id = :paramClassId
+          cs.del_flg = 0
+          AND s.del_flg = 0
+          AND cs.class_id = :paramClassId
       `,
       {
         replacements: {
@@ -78,7 +101,7 @@ router.get("/classSchedule/:id", checkAuth, async (req, res) => {
     const paramClassId = req.params.id
     const classSchedule = await Class.sequelize.query(`
       SELECT
-          wd.id, 
+          wd.schedule_id, 
           wd.day_of_week, 
           wd.start_time, 
           wd.end_time,
@@ -105,25 +128,29 @@ router.get("/classSchedule/:id", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/classWeeklyScheduleByDate", checkAuth, async (req, res) => {
+router.get("/classWeeklySchedule", checkAuth, async (req, res) => {
   try {
-    const userDepartmentId = req.session.user.department_id;
-    const paramDate = req.query.date; // Ngày được truyền từ client (ví dụ: '2024-10-09')
+    // const paramDate = req.query.date; // Ngày được truyền từ client (ví dụ: '2024-10-09')
+    const paramdepartmentId = req.query.departmentId; // Department được truyền từ client
 
-    if (!paramDate) {
-      return res.status(400).json({ message: "Thiếu tham số ngày (date)" });
-    }
+    // if (!paramDate) {
+    //   return res.status(400).json({ message: "Thiếu tham số ngày (date)" });
+    // }
     // Truy vấn danh sách lớp học
     const classData = await Class.sequelize.query(
       `
         SELECT 
-            wd.day_of_week, 
+            c.class_id,
+            wd.schedule_id, 
+            wd.working_day_id, 
             wd.start_time, 
             wd.end_time,
             wd.is_temporary,
-            c.class_name AS className, 
+            c.class_name, 
             l.level_code AS level,
             teachers.teachers, 
+            c.Start_date,
+            c.End_date,
             c.note, 
             COUNT(cs.student_id) AS totalStudent,
             GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.student_id SEPARATOR ', ') AS students
@@ -154,55 +181,53 @@ router.get("/classWeeklyScheduleByDate", checkAuth, async (req, res) => {
         WHERE 
             c.del_flg = 0
             AND wd.del_flg = 0
-            AND (:userDepartmentId = 1 OR c.department_id = :userDepartmentId)
-            AND c.Start_date >= DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
-            AND c.Start_date < DATE_ADD(DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY), INTERVAL 7 DAY)
+            AND (:paramdepartmentId = 1 OR c.department_id = :paramdepartmentId)
         GROUP BY 
-            wd.day_of_week, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name, l.level_code, teachers.teachers, c.note
+            wd.working_day_id, wd.schedule_id, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name, l.level_code, teachers.teachers, c.note
         ORDER BY 
-            wd.day_of_week, wd.start_time, c.class_name;
+            wd.working_day_id, wd.start_time, c.class_name;
       `,
       {
         replacements: {
-          userDepartmentId,
-          paramDate,
+          // paramDate,
+          paramdepartmentId,
         },
         type: Class.sequelize.QueryTypes.SELECT,
       }
     );
 
-    // Xử lý để trả về đúng format JSON
-    const data = classData.reduce((acc, curr) => {
-      let sessionObj = acc.find(
-        (item) =>
-          item.day_of_week === curr.day_of_week &&
-          item.start_time === curr.start_time &&
-          item.end_time === curr.end_time
-      );
+    // // Xử lý để trả về đúng format JSON
+    // const data = classData.reduce((acc, curr) => {
+    //   let sessionObj = acc.find(
+    //     (item) =>
+    //       item.day_of_week === curr.day_of_week &&
+    //       item.start_time === curr.start_time &&
+    //       item.end_time === curr.end_time
+    //   );
 
-      if (!sessionObj) {
-        sessionObj = {
-          day_of_week: curr.day_of_week,
-          start_time: curr.start_time,
-          end_time: curr.end_time,
-          classes: [],
-        };
-        acc.push(sessionObj);
-      }
+    //   if (!sessionObj) {
+    //     sessionObj = {
+    //       day_of_week: curr.day_of_week,
+    //       start_time: curr.start_time,
+    //       end_time: curr.end_time,
+    //       classes: [],
+    //     };
+    //     acc.push(sessionObj);
+    //   }
 
-      sessionObj.classes.push({
-        className: curr.className,
-        level: curr.level,
-        totalStudent: curr.totalStudent,
-        students: curr.students,
-        teachers: curr.teachers,
-        note: curr.note,
-      });
+    //   sessionObj.classes.push({
+    //     className: curr.className,
+    //     level: curr.level,
+    //     totalStudent: curr.totalStudent,
+    //     students: curr.students,
+    //     teachers: curr.teachers,
+    //     note: curr.note,
+    //   });
 
-      return acc;
-    }, []);
+    //   return acc;
+    // }, []);
 
-    res.json(data);
+    res.json(classData);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

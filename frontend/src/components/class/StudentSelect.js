@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { format } from "date-fns";
+import Toast from "../toast";
+
 
 const StudentSelect = ({
   classId,
@@ -20,9 +22,6 @@ const StudentSelect = ({
     note: "",
   });
 
-  // useRef để ngăn việc gọi lại API khi không cần thiết
-  const initialFetch = useRef(true);
-
   // Fetch students when levelId or departmentId changes
   useEffect(() => {
     const fetchStudents = async () => {
@@ -38,6 +37,10 @@ const StudentSelect = ({
           setStudents(response.data); // Lưu danh sách học sinh
           setFilteredStudents(response.data);
         } catch (error) {
+          Toast.fire({
+            icon: "error",
+            title: "Lỗi khi lấy thông tin",
+          });
           console.error("Error fetching students", error);
         }
       } else {

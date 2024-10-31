@@ -4,6 +4,7 @@ import { useNavigate, useParams, useOutletContext } from "react-router-dom"; // 
 import axios from "axios";
 import { format } from "date-fns";
 import UserRole from '../../UserRole';
+import Toast from "../toast";
 
 const EditTeacher = () => {
   const { user } = useOutletContext(); // Lấy user từ context
@@ -27,10 +28,10 @@ const EditTeacher = () => {
         const response = await axios.get('/api/departments'); // Đảm bảo API này tồn tại
         setDepartments(response.data);
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          // Chuyển hướng đến trang login
-          navigate("/login"); // Hoặc sử dụng React Router để chuyển hướng
-        }
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error('Lỗi khi lấy danh sách chi nhánh', error);
       }
     };
@@ -56,6 +57,10 @@ const EditTeacher = () => {
             department_code: teacherData.Department?.department_code || "", // Lấy department_code từ Department
           });
       } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error("Lỗi khi lấy thông tin giáo viên", error);
       }
     };
@@ -74,8 +79,16 @@ const EditTeacher = () => {
     e.preventDefault();
     try {
       await axios.put(`/api/updateTeacher/${id}`, teacher); // Gọi API để cập nhật thông tin giáo viên
+      Toast.fire({
+        icon: "success",
+        title: "Thay đổi thông tin giáo viên thành công!",
+      });
       navigate("/teacherlist"); // Chuyển hướng về danh sách giáo viên
     } catch (error) {
+      Toast.fire({
+        icon: "error",
+        title: "Thay đổi thông tin giáo viên thất bại",
+      });
       console.error("Lỗi khi cập nhật thông tin giáo viên", error);
     }
   };

@@ -18,6 +18,8 @@ import EditLevel from "./components/level/EditLevel.js";
 import ClassList from "./components/class/ClassList.js";
 import AddClass from "./components/class/AddClass.js";
 import EditClass from "./components/class/EditClass.js";
+import WorkCalendar from "./components/work/WorkCalendar.js";
+import DetailSession from "./components/work/DetailSession.js";
 import axios from "axios";
 
 // Thiết lập axios với baseURL và tùy chọn withCredentials
@@ -48,7 +50,8 @@ const App = () => {
           {/* Top là một route được bảo vệ */}
           <Route path="/" element={<WithAuth><Top /></WithAuth>}>
             <Route path="/"  element={<WithAuth><WorkSchedule /></WithAuth>} /> {/* Route mặc định cho Top */}
-            <Route path="workschedule" element={<WithAuth><WorkSchedule /></WithAuth>} />
+            <Route path="workcalendar" element={<WithAuth><WorkCalendar /></WithAuth>} />
+            <Route path="detailsession" element={<WithAuth><DetailSession /></WithAuth>} />
             {/* Student component */}
             <Route path="studentlist" element={<WithAuth><StudentList /></WithAuth>} />
             <Route path="addstudent" element={<WithAuth><AddStudent /></WithAuth>} />

@@ -4,6 +4,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import TeacherSelect from "./TeacherSelect"; // Import TeacherSelect
 import StudentSelect from "./StudentSelect"; // Import StudentSelect
 import UserRole from '../../UserRole';
+import Toast from "../toast";
 
 const AddClass = () => {
   const navigate = useNavigate();
@@ -42,6 +43,10 @@ const AddClass = () => {
         setWorkingDays(workingDayRes.data);
         setTeachers(teacherRes.data);
       } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error("Error fetching data", error);
       }
     };
@@ -106,9 +111,17 @@ const AddClass = () => {
     e.preventDefault();
     try {
       await axios.post("/api/addClass", classData);
+      Toast.fire({
+        icon: "success",
+        title: "Đăng ký lớp mới thành công!",
+      });
       navigate("/classlist"); // Navigate back to the class list page after successful submission
     } catch (error) {
-      console.error("Error submitting form", error);
+      Toast.fire({
+        icon: "error",
+        title: "Đăng ký lớp mới thất bại",
+      });
+      console.error("Đăng ký lớp mới thất bại", error);
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
+import Toast from "../toast";
 
 const TeacherList = () => {
   const [teachers, setTeachers] = useState([]); // Dữ liệu sinh viên
@@ -29,10 +30,11 @@ const TeacherList = () => {
         setFilteredTeachers(teacherData);
       })
       .catch((error) => {
-        // if (error.response && error.response.status === 401) {
-        //   // Chuyển hướng đến trang login
-        //   navigate("/login"); // Hoặc sử dụng React Router để chuyển hướng
-        // }
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
+        console.error('Lỗi khi lấy thông tin', error);
       });
   }, []);
 

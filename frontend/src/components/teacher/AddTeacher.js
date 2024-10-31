@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom"; // Sử dụng useNavigate
 import axios from "axios";
-import UserRole from '../../UserRole';
+import UserRole from "../../UserRole";
+import Toast from "../toast";
 
 const AddTeacher = () => {
   const { user } = useOutletContext(); // Lấy user từ context
@@ -25,14 +26,18 @@ const AddTeacher = () => {
         const response = await axios.get("/api/departments"); // Đảm bảo API này tồn tại
         setDepartments(response.data);
       } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
         console.error("Lỗi khi lấy danh sách chi nhánh", error);
       }
     };
 
     fetchDepartments();
-    
+
     // Lấy thông tin người dùng từ localStorage
-    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+    if (user && user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
       setFormData((prevData) => ({
         ...prevData,
         department_id: user.department_id, // Gán department_id mặc định
@@ -52,31 +57,18 @@ const AddTeacher = () => {
     e.preventDefault();
     try {
       await axios.post("/api/addTeacher", formData); // Gọi API để thêm giáo viên
-      // Hiển thị popup xác nhận
-      const confirmMessage =
-        "Đã đăng ký giáo viên thành công. Có muốn chuyển về màn hình danh sách giáo viên hay không?";
-      const userConfirmed = window.confirm(confirmMessage); // Hiển thị popup
-
-      if (userConfirmed) {
-        navigate("/teacherlist"); // Chuyển hướng về danh sách giáo viên
-      }
-      // Nếu người dùng chọn "Không", không làm gì cả và giữ lại màn hình thêm giáo viên
-      // Reset form
-      setFormData({
-        full_name: "",
-        birthday: "",
-        phone: "",
-        facebook: "",
-        address: "",
-        department_id: "",
-        note: "",
+      Toast.fire({
+        icon: "success",
+        title: "Đăng ký giáo viên thành công!",
       });
+      navigate("/teacherlist"); // Chuyển hướng về danh sách giáo viên
+      
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        // Chuyển hướng đến trang login
-        navigate("/login"); // Hoặc sử dụng React Router để chuyển hướng
-      }
-      console.error("Lỗi khi thêm giáo viên", error);
+      Toast.fire({
+        icon: "error",
+        title: "Đăng ký giáo viên thất bại",
+      });
+      console.error("Error submitting form", error);
     }
   };
 
@@ -163,7 +155,10 @@ const AddTeacher = () => {
                 onChange={handleChange}
                 required
                 disabled={
-                  user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true
+                  user?.role === UserRole.SYSTEM ||
+                  user?.role === UserRole.ADMIN
+                    ? false
+                    : true
                 } // Disable cho các vai trò không phải ADMIN hoặc SYSTEM
               >
                 <option value="">Chọn chi nhánh</option>

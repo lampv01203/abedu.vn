@@ -1,39 +1,39 @@
 @mixin width-generator($start, $end, $step) {
-    @for $i from $start through $end {
-      .w-#{$i} {
-        width: #{$i}px;
-      }
+  @for $i from $start through $end {
+    .w-#{$i} {
+      width: #{$i}px;
     }
   }
-  
-  @include width-generator(50, 800, 5);
+}
 
-  @mixin height-generator($start, $end, $step) {
-    @for $i from $start through $end {
-      .h-#{$i} {
-        height: #{$i}px;
-      }
-    }
-  }
-  
-  @include height-generator(10, 500, 5);
+@include width-generator(50, 800, 5);
 
-  @mixin min-height-generator($start, $end, $step) {
-    @for $i from $start through $end {
-      .min-h-#{$i} {
-        min-height: #{$i}px;
-      }
+@mixin height-generator($start, $end, $step) {
+  @for $i from $start through $end {
+    .h-#{$i} {
+      height: #{$i}px;
     }
   }
-  
-  @include min-height-generator(10, 500, 5);
+}
 
-  @mixin max-height-generator($start, $end, $step) {
-    @for $i from $start through $end {
-      .max-h-#{$i} {
-        max-height: #{$i}px;
-      }
+@include height-generator(10, 500, 5);
+
+@mixin min-height-generator($start, $end, $step) {
+  @for $i from $start through $end {
+    .min-h-#{$i} {
+      min-height: #{$i}px;
     }
   }
-  
-  @include max-height-generator(10, 500, 5);
+}
+
+@include min-height-generator(10, 500, 5);
+
+@mixin max-height-generator($start, $end, $step) {
+  @for $i from $start through $end {
+    .max-h-#{$i} {
+      max-height: #{$i}px;
+    }
+  }
+}
+
+@include max-height-generator(10, 500, 5);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useHistory
 import { NumericFormat } from "react-number-format";
 import axios from "axios";
+import Toast from "../toast";
 
 const AddLevel = () => {
   const navigate = useNavigate();
@@ -27,24 +28,16 @@ const AddLevel = () => {
     e.preventDefault();
     try {
       await axios.post("/api/addLevel", level); // Gọi API để thêm cấp độ học
-      // Hiển thị popup xác nhận
-      const confirmMessage =
-        "Đã đăng ký cấp độ học thành công. Có muốn chuyển về màn hình danh sách cấp độ hay không?";
-      const userConfirmed = window.confirm(confirmMessage); // Hiển thị popup
-
-      if (userConfirmed) {
-        navigate("/levellist"); // Chuyển hướng về danh sách học sinh
-      }
-      // Nếu người dùng chọn "Không"
-      // Reset form
-      setLevel({
-        level_code: "",
-        description: "",
-        session_number: "",
-        course_fees: "",
-        note: "",
+      Toast.fire({
+        icon: "success",
+        title: "Đăng ký cấp độ học mới thành công!",
       });
+      navigate("/levellist"); // Chuyển hướng về danh sách học sinh
     } catch (error) {
+      Toast.fire({
+        icon: "error",
+        title: "Đăng ký cấp độ học mới thất bại",
+      });
       console.error("Lỗi khi thêm cấp độ học", error);
     }
   };
@@ -59,94 +52,104 @@ const AddLevel = () => {
         <div className="card-body w-500">
           {/* Mã cấp độ */}
           <div className="form-group row">
-            <label htmlFor="levelCode" className="col-sm-3 col-form-label">Mã cấp độ</label>
+            <label htmlFor="levelCode" className="col-sm-3 col-form-label">
+              Mã cấp độ
+            </label>
             <div className="col-sm-9">
               <input
-              type="text"
-              className="form-control"
-              id="levelCode"
-              name="level_code"
-              value={level.level_code}
-              onChange={handleChange}
-              placeholder="Nhập mã cấp độ"
-              required
-            />
-          </div>
+                type="text"
+                className="form-control"
+                id="levelCode"
+                name="level_code"
+                value={level.level_code}
+                onChange={handleChange}
+                placeholder="Nhập mã cấp độ"
+                required
+              />
+            </div>
           </div>
 
           {/* Nội dung */}
           <div className="form-group row">
-            <label htmlFor="description" className="col-sm-3 col-form-label">Nội dung</label>
+            <label htmlFor="description" className="col-sm-3 col-form-label">
+              Nội dung
+            </label>
             <div className="col-sm-9">
               <input
-              type="text"
-              className="form-control"
-              id="description"
-              name="description"
-              value={level.description}
-              onChange={handleChange}
-              placeholder="Nhập nội dung"
-              required
-            />
-          </div>
+                type="text"
+                className="form-control"
+                id="description"
+                name="description"
+                value={level.description}
+                onChange={handleChange}
+                placeholder="Nhập nội dung"
+                required
+              />
+            </div>
           </div>
 
           {/* Số buổi học */}
           <div className="form-group row">
-            <label htmlFor="sessionNumber" className="col-sm-3 col-form-label">Số buổi học</label>
+            <label htmlFor="sessionNumber" className="col-sm-3 col-form-label">
+              Số buổi học
+            </label>
             <div className="col-sm-9">
               <input
-              type="number"
-              className="form-control"
-              id="sessionNumber"
-              name="session_number"
-              value={level.session_number}
-              onChange={handleChange}
-              placeholder="Nhập số buổi học"
-            />
-          </div>
+                type="number"
+                className="form-control"
+                id="sessionNumber"
+                name="session_number"
+                value={level.session_number}
+                onChange={handleChange}
+                placeholder="Nhập số buổi học"
+              />
+            </div>
           </div>
 
           {/* Học phí */}
           <div className="form-group row">
-            <label htmlFor="courseFees" className="col-sm-3 col-form-label">Học phí</label>
+            <label htmlFor="courseFees" className="col-sm-3 col-form-label">
+              Học phí
+            </label>
             <div className="col-sm-9">
               <NumericFormat
-              className="form-control"
-              id="courseFees"
-              name="course_fees"
-              value={level.course_fees}
-              onValueChange={(values) =>
-                handleChange({
-                  target: {
-                    name: "course_fees",
-                    value: values.value,
-                  },
-                })
-              } // Thay đổi cách xử lý onValueChange
-              thousandSeparator={true} // Đặt dấu phân cách hàng nghìn
-              allowNegative={true} // Cho phép nhập số âm
-              prefix="" // Nếu bạn muốn thêm tiền tệ (ví dụ: "VND ")
-              placeholder="Nhập học phí"
-              decimalScale={0} // Không cho phép phần thập phân
-              displayType="input" // Hiển thị dưới dạng input
-            />
-          </div>
+                className="form-control"
+                id="courseFees"
+                name="course_fees"
+                value={level.course_fees}
+                onValueChange={(values) =>
+                  handleChange({
+                    target: {
+                      name: "course_fees",
+                      value: values.value,
+                    },
+                  })
+                } // Thay đổi cách xử lý onValueChange
+                thousandSeparator={true} // Đặt dấu phân cách hàng nghìn
+                allowNegative={true} // Cho phép nhập số âm
+                prefix="" // Nếu bạn muốn thêm tiền tệ (ví dụ: "VND ")
+                placeholder="Nhập học phí"
+                decimalScale={0} // Không cho phép phần thập phân
+                displayType="input" // Hiển thị dưới dạng input
+              />
+            </div>
           </div>
 
           {/* Note */}
           <div className="form-group row">
-            <label htmlFor="note" className="col-sm-3 col-form-label">Ghi chú</label>
+            <label htmlFor="note" className="col-sm-3 col-form-label">
+              Ghi chú
+            </label>
             <div className="col-sm-9">
               <textarea
-              className="form-control"
-              id="note"
-              name="note"
-              value={level.note}
-              onChange={handleChange}
-              placeholder="Nhập ghi chú"
-            ></textarea>
-          </div>
+                className="form-control"
+                id="note"
+                name="note"
+                value={level.note}
+                onChange={handleChange}
+                placeholder="Nhập ghi chú"
+              ></textarea>
+            </div>
           </div>
         </div>
 

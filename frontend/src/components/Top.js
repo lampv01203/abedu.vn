@@ -1,72 +1,65 @@
-// File: src/Top.js
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useHistory
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Link, Outlet } from "react-router-dom";
-import "../css/index.css"; // Import Bootstrap CSS
+import { NavLink, Outlet } from "react-router-dom"; // Sử dụng NavLink thay cho Link
+import "../css/index.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "overlayscrollbars";
 import "apexcharts";
-import "admin-lte/dist/js/adminlte.js"; // Import AdminLTE JS
-import "admin-lte/dist/css/adminlte.css"; // Import AdminLTE JS
+import "admin-lte/dist/js/adminlte.js";
+import "admin-lte/dist/css/adminlte.css";
 import 'select2/dist/css/select2.min.css';
-import '../css/table.css'; // Import Bootstrap CSS
-import '../css/table.scss'; // Import Bootstrap CSS
-import '../css/form.css'; // Import Bootstrap CSS
-import '../css/form.scss'; // Import Bootstrap CSS
+import '../css/table.css';
+import '../css/table.scss';
+import '../css/form.css';
+import '../css/form.scss';
 import UserRole from '../UserRole';
 
 const TopScreen = () => {
   const navigate = useNavigate();
-  const [user, setUser] = React.useState(null); // Khởi tạo state cho user
+  const [user, setUser] = React.useState(null);
 
-
-  // Kiểm tra user và redirect nếu không có
   useEffect(() => {
-    // Lấy thông tin user từ localStorage
     try {
       const userData = JSON.parse(localStorage.getItem("user"));
       if (!userData) {
-        navigate("/login"); // Chuyển hướng về màn hình login
+        navigate("/login");
       } else {
-        setUser(userData); // Cập nhật state user
+        setUser(userData);
       }
     } catch (error) {
-      navigate("/login"); // Chuyển hướng về màn hình login
+      navigate("/login");
     }
   }, [navigate]);
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/logout"); // Gọi API logout
-      localStorage.removeItem("user"); // Xóa thông tin user khỏi session
-      // Redirect hoặc refresh trang sau khi logout
-      navigate("/login"); // Chuyển hướng về màn hình login
+      await axios.post("/api/logout");
+      localStorage.removeItem("user");
+      navigate("/login");
     } catch (error) {
       console.error("Lỗi khi đăng xuất", error);
     }
   };
+
   return (
     <div className="app-wrapper">
       {/* Header */}
       <nav className="app-header navbar navbar-expand bg-body">
         <div className="container-fluid">
-          {/* Navbar Start Links */}
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link
+              <NavLink
                 className="nav-link"
                 data-widget="pushmenu"
-                href="#"
+                to="#"
                 role="button"
               >
                 <i className="fas fa-bars"></i>
-              </Link>
+              </NavLink>
             </li>
           </ul>
-          {/* Navbar End Links */}
           <ul className="navbar-nav ms-auto">
-            {/* Notifications Dropdown */}
             <li className="nav-item dropdown">
               <button className="nav-link" data-bs-toggle="dropdown">
                 <i className="bi bi-bell-fill"></i>
@@ -83,7 +76,6 @@ const TopScreen = () => {
                 </button>
               </div>
             </li>
-            {/* User Menu */}
             <li className="nav-item dropdown user-menu">
               <button
                 className="nav-link dropdown-toggle"
@@ -128,19 +120,14 @@ const TopScreen = () => {
         data-bs-theme="dark"
       >
         <div className="sidebar-brand">
-          <Link to="/" className="brand-link">
-            {" "}
-            {/* begin::Brand Image */}
+          <NavLink to="/" className="brand-link">
             <img
               src={`${process.env.PUBLIC_URL}/img/ABedu.vn.png`}
               alt="ABedu"
               className="brand-image opacity-75 shadow"
             />
-            {/* end::Brand Image */} {/* begin::Brand Text */}
-            <span className="brand-text fw-light">ABedu</span>{" "}
-            {/* end::Brand Text */}
-          </Link>{" "}
-          {/* end::Brand Link */}
+            <span className="brand-text fw-light">ABedu</span>
+          </NavLink>
         </div>
         <div className="sidebar-wrapper">
           <nav className="mt-2">
@@ -150,50 +137,35 @@ const TopScreen = () => {
               role="menu"
             >
               <li className="nav-item">
-                <Link to="/workschedule" className="nav-link">
+                <NavLink to="/workcalendar" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
                   <i className="nav-icon fas fa-calendar-alt"></i>
-                  <p>
-                    Lịch làm việc
-                    <i className="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </Link>
+                  <p>Lịch làm việc</p>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to="/teacherlist" className="nav-link">
+                <NavLink to="/teacherlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
                   <i className="nav-icon fa-solid fa-chalkboard-user"></i>
-                  <p>
-                    Danh sách giáo viên
-                    <i className="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </Link>
+                  <p>Danh sách giáo viên</p>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to="/studentlist" className="nav-link">
+                <NavLink to="/studentlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
                   <i className="nav-icon fa-solid fa-users"></i>
-                  <p>
-                    Danh sách học sinh
-                    <i className="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </Link>
+                  <p>Danh sách học sinh</p>
+                </NavLink>
               </li>
               <li className="nav-item">
-                <Link to="/classlist" className="nav-link">
+                <NavLink to="/classlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
                   <i className="nav-icon fa-solid fa-school"></i>
-                  <p>
-                    Danh sách lớp học
-                    <i className="nav-arrow bi bi-chevron-right"></i>
-                  </p>
-                </Link>
+                  <p>Danh sách lớp học</p>
+                </NavLink>
               </li>
               {(user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN) && (
                 <li className="nav-item">
-                  <Link to="/levellist" className="nav-link">
+                  <NavLink to="/levellist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
                     <i className="nav-icon fa-duotone fa-solid fa-layer-group"></i>
-                    <p>
-                      Danh sách cấp độ
-                      <i className="nav-arrow bi bi-chevron-right"></i>
-                    </p>
-                  </Link>
+                    <p>Danh sách cấp độ</p>
+                  </NavLink>
                 </li>
               )}
             </ul>
@@ -203,8 +175,7 @@ const TopScreen = () => {
 
       {/* Main Content */}
       <main className="app-main">
-        {/* Outlet hiển thị các component con */}
-        <Outlet context={{ user }} /> {/* Truyền user như context */}
+        <Outlet context={{ user }} />
       </main>
       <footer className="main-footer">
         <div className="float-right d-none d-sm-block">
@@ -212,8 +183,7 @@ const TopScreen = () => {
         </div>
         <strong>
           Copyright © 2014-2021 <a href="https://abedu.vn">ABedu.vn</a>.
-        </strong>{" "}
-        All rights reserved.
+        </strong> All rights reserved.
       </footer>
     </div>
   );
