@@ -52,7 +52,7 @@ const AddClass = () => {
     };
     fetchData();
     // Lấy thông tin người dùng từ localStorage
-    if (user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
+    if (user && user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN) {
       setClassData((prevData) => ({
         ...prevData,
         department_id: user.department_id, // Gán department_id mặc định
