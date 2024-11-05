@@ -47,32 +47,8 @@ const StudentSelect = ({
         setStudents([]); // Reset danh sách học sinh nếu không có levelId
       }
     };
-
-    // if (initialFetch.current || (levelId && departmentId)) {
-    //   initialFetch.current = false; // Đảm bảo chỉ gọi fetch khi cần
-    //   fetchStudents();
-    // }
     fetchStudents();
   }, [classId, levelId, departmentId]); // Chỉ theo dõi các dependency cần thiết
-
-  // useEffect(() => {
-  //   const selectedIds = selectedStudents || [];
-  //   console.log('Selected IDs:', selectedIds);
-  //   console.log('Students:', students);
-
-  //   const autoSelectedStudents = students
-  //     .filter((student) => selectedIds.includes(student.student_id))
-  //     .map((student) => student.student_id);
-
-  //   console.log('Auto-selected Students:', autoSelectedStudents);
-
-  //   // Chỉ cập nhật nếu có thay đổi
-  //   if (
-  //     JSON.stringify(autoSelectedStudents) !== JSON.stringify(selectedStudents)
-  //   ) {
-  //     setSelectedStudents(autoSelectedStudents);
-  //   }
-  // }, [students, selectedStudents, setSelectedStudents]);
 
   // Hàm để thêm hoặc loại bỏ học sinh khỏi danh sách
   const toggleStudent = (student_id) => {

@@ -196,37 +196,6 @@ router.get("/classWeeklySchedule", checkAuth, async (req, res) => {
       }
     );
 
-    // // Xử lý để trả về đúng format JSON
-    // const data = classData.reduce((acc, curr) => {
-    //   let sessionObj = acc.find(
-    //     (item) =>
-    //       item.day_of_week === curr.day_of_week &&
-    //       item.start_time === curr.start_time &&
-    //       item.end_time === curr.end_time
-    //   );
-
-    //   if (!sessionObj) {
-    //     sessionObj = {
-    //       day_of_week: curr.day_of_week,
-    //       start_time: curr.start_time,
-    //       end_time: curr.end_time,
-    //       classes: [],
-    //     };
-    //     acc.push(sessionObj);
-    //   }
-
-    //   sessionObj.classes.push({
-    //     className: curr.className,
-    //     level: curr.level,
-    //     totalStudent: curr.totalStudent,
-    //     students: curr.students,
-    //     teachers: curr.teachers,
-    //     note: curr.note,
-    //   });
-
-    //   return acc;
-    // }, []);
-
     res.json(classData);
   } catch (err) {
     console.error(err.message);
@@ -473,6 +442,90 @@ router.delete("/deleteClass/:id", checkAuth, async (req, res) => {
   } catch (error) {
     console.error("Lỗi khi xóa lớp học", error);
     res.status(500).json({ message: "Lỗi server" });
+  }
+});
+
+router.get("/getClassesByTeacherId/:teacherId", checkAuth, async (req, res) => {
+  try {
+    const paramTeacherId = req.params.teacherId;
+    const classes = await Class.sequelize.query(`
+      SELECT
+          c.class_id,
+          c.class_name,
+          c.start_date,
+          c.end_date,
+          c.graduated_flg,
+          c.note,
+          level.level_code,
+          d.department_code,
+          COUNT(ta.id) AS total_sessions
+      FROM 
+          class_teacher ct
+      INNER JOIN 
+          class c ON ct.class_id = c.class_id AND c.del_flg = 0
+      INNER JOIN
+          level ON c.level_id = level.level_id AND level.del_flg = 0
+      INNER JOIN
+          department d ON c.department_id = d.department_id AND d.del_flg = 0
+      LEFT JOIN 
+          teacher_attend ta ON ta.class_id = c.class_id AND ta.teacher_id = :paramTeacherId
+      WHERE
+          ct.del_flg = 0
+          AND ct.teacher_id = :paramTeacherId
+      GROUP BY 
+          c.class_id, c.class_name, c.start_date, c.end_date, c.graduated_flg, 
+          c.note, level.level_code, d.department_code
+      `,
+      {
+        replacements: { paramTeacherId },
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/getClassesByStudentId/:studentId", checkAuth, async (req, res) => {
+  try {
+    const paramStudentId = req.params.studentId;
+    const classes = await Class.sequelize.query(`
+      SELECT
+          c.class_id,
+          c.class_name,
+          c.start_date,
+          c.end_date,
+          c.graduated_flg,
+          c.note,
+          level.level_code,
+          d.department_code,
+          COUNT(sa.id) AS total_sessions
+      FROM 
+          class_students cs
+      INNER JOIN 
+          class c ON cs.class_id = c.class_id AND c.del_flg = 0
+      INNER JOIN
+          level ON c.level_id = level.level_id AND level.del_flg = 0
+      INNER JOIN
+          department d ON c.department_id = d.department_id AND d.del_flg = 0
+      LEFT JOIN 
+          student_attend sa ON sa.class_id = c.class_id AND sa.student_id = :paramStudentId
+      WHERE
+          cs.del_flg = 0
+          AND cs.student_id = :paramStudentId
+      GROUP BY 
+          c.class_id, c.class_name, c.start_date, c.end_date, c.graduated_flg, 
+          c.note, level.level_code, d.department_code
+      `,
+      {
+        replacements: { paramStudentId },
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
