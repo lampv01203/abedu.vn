@@ -5,6 +5,7 @@ const Teacher = require("../models/Teacher"); // Import mô hình Teacher
 const Department = require("../models/Department"); // Import mô hình Department
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 const { Op } = require("sequelize");
+const UserRole = require('../models/UserRole');
 
 router.get("/teachers", checkAuth, async (req, res) => {
   try {
@@ -14,7 +15,7 @@ router.get("/teachers", checkAuth, async (req, res) => {
     };
 
     // Nếu department_id của user khác 1, thêm điều kiện lọc department_id
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       query.department_id = user.department_id;
     }
 
@@ -37,9 +38,7 @@ router.get("/getTeachers", checkAuth, async (req, res) => {
     const query = {
       del_flg: 0, // Lọc chỉ lấy giáo viên chưa bị xóa
     };
-
-    // Nếu department_id của user khác 1, thêm điều kiện lọc department_id
-    if (user.department_id !== 1) {
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       query.department_id = user.department_id;
     }
 
@@ -137,7 +136,7 @@ router.put("/updateTeacher/:id", checkAuth, async (req, res) => {
         [Op.and]: [
           { del_flg: 0 }, // Kiểm tra giáo viên chưa bị xóa
           { teacher_id: { [Op.ne]: req.params.id } }, // Giáo viên không phải là giáo viên đang cập nhật
-          { [Op.or]: [{ full_name }, { birthday }, { phone }] }, // Kiểm tra trùng lặp
+          { [Op.and]: [{ full_name }, { birthday }, { phone }] }, // Kiểm tra trùng lặp
         ],
       },
     });
@@ -179,4 +178,41 @@ router.delete("/deleteTeacher/:id", checkAuth, async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 });
+
+// Trong routes hoặc controller của bạn
+router.get('/getTeacherAttend/:teacherId/:classId', async (req, res) => {
+  const { teacherId, classId } = req.params;
+  try {
+    const attendData = await Teacher.sequelize.query(`
+      SELECT 
+          ta.id,
+          cs.day_of_week,
+          ta.attend_date,
+          cs.start_time,
+          cs.end_time,
+          ta.session_salary
+        FROM 
+          teacher_attend ta
+        INNER JOIN 
+          class_schedule cs ON ta.schedule_id = cs.schedule_id
+        WHERE
+          cs.del_flg = 0
+          AND ta.class_id = :classId
+          AND ta.teacher_id = :teacherId
+      `,
+      {
+        replacements: {
+          teacherId,
+          classId
+        },
+        type: Teacher.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(attendData);
+  } catch (error) {
+    console.error("Error fetching attendance data:", error);
+    res.status(500).send("Error fetching attendance data");
+  }
+});
+
 module.exports = router;

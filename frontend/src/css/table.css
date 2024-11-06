@@ -36,7 +36,7 @@
 
 /* css student list */
 .w-stt {
-  padding-left: 1rem !important;
+  padding-left: 0.5rem !important;
   width: 55px;
   text-align: center;
 }
@@ -71,4 +71,12 @@
 
 a {
   text-decoration: none;
+}
+
+.border-right {
+  border-right: 1px solid #dee2e6 !important;
+}
+
+.attend-table tbody tr:hover {
+  cursor: pointer; /* Thiết lập con trỏ khi rê chuột vào dòng */
 }

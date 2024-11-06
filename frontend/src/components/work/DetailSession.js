@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import SessionFee from "./SessionFee";
+import SessionSalary from "./SessionSalary";
 import Toast from "../toast";
-
 
 const DetailSession = ({
   classId,
@@ -11,6 +10,7 @@ const DetailSession = ({
   endTime,
   dayOfWeek,
   date,
+  onClose, // Added onClose here as a prop
 }) => {
   const [classData, setClassData] = useState({
     class_id: "",
@@ -25,21 +25,44 @@ const DetailSession = ({
   useEffect(() => {
     const fetchClassInfo = async () => {
       try {
-        const [classRes, classTeacherRes, classStudentRes, workingDayRes] = await Promise.all([
-          axios.get(`/api/getClass/${classId}`),
-          axios.get(`/api/classTeacher/${classId}`),
-          axios.get(`/api/classStudent/${classId}`),
-          axios.get(`/api/getWorkingDay/${dayOfWeek}`),
-        ]);
-        setClassData({
-          ...classRes.data,
-          attend_date: date,
-          schedule_id: scheduleId,
-          teachers: classTeacherRes.data,
-          students: classStudentRes.data,
-          selectedFee: SessionFee.ASSISTANT.value, // Default selected fee
-          dayOfWeek: workingDayRes.data.day_of_week
-        });
+        const [classRes, classTeacherRes, classStudentRes, workingDayRes] =
+          await Promise.all([
+            axios.get(`/api/getClass/${classId}`),
+            axios.get("/api/classTeacher", {
+              params: {
+                class_id: classId || "",
+                schedule_id: scheduleId || "",
+              },
+            }),
+            axios.get("/api/classStudent", {
+              params: {
+                class_id: classId || "",
+                schedule_id: scheduleId || "",
+              },
+            }),
+            axios.get(`/api/getWorkingDay/${dayOfWeek}`),
+          ]);
+
+          // Ensure each teacher has a `session_salary` default value
+          const teachers = classTeacherRes.data.map((teacher) => ({
+            ...teacher,
+            session_salary: parseFloat(teacher.session_salary) || 0, // Set to empty string if undefined
+          }));
+
+          // Ensure each teacher has a `attend_flg` default value
+          const students = classStudentRes.data.map((student) => ({
+            ...student,
+            attend_flg: student.attend_flg || 0, // Set to FALSE if undefined
+          }));
+    
+          setClassData({
+            ...classRes.data,
+            attend_date: date,
+            schedule_id: scheduleId,
+            teachers,
+            students,
+            dayOfWeek: workingDayRes.data.day_of_week,
+          });
       } catch (error) {
         Toast.fire({
           icon: "error",
@@ -74,10 +97,27 @@ const DetailSession = ({
     }
   };
 
-  const handleFeeChange = (e) => {
+  const handleFeeChange = (e, teacherId) => {
+    const updatedTeachers = classData.teachers.map((teacher) =>
+      teacher.teacher_id === teacherId
+        ? { ...teacher, session_salary: e.target.value }
+        : teacher
+    );
     setClassData({
       ...classData,
-      selectedFee: e.target.value,
+      teachers: updatedTeachers,
+    });
+  };
+
+  const handleAttendanceChange = (e, studentId) => {
+    const updatedStudents = classData.students.map((student) =>
+      student.student_id === studentId
+        ? { ...student, attend_flg: e.target.checked }
+        : student
+    );
+    setClassData({
+      ...classData,
+      students: updatedStudents,
     });
   };
 
@@ -91,8 +131,8 @@ const DetailSession = ({
         <div className="row">
           <div className="col-sm-6">
             <h5>
-              <i className="fa-solid fa-calendar-days"></i> {classData.dayOfWeek} ngày:{" "}
-              {date?.toLocaleDateString()}
+              <i className="fa-solid fa-calendar-days"></i>{" "}
+              {classData.dayOfWeek} ngày: {date?.toLocaleDateString()}
             </h5>
           </div>
           <div className="col-sm-6">
@@ -103,7 +143,7 @@ const DetailSession = ({
           </div>
         </div>
         <div className="row">
-          <div className="col-sm-6">
+          <div className="col-sm-6 border-right">
             <div className="form-group">
               <h5>
                 <i className="fas fa-check"></i> Chấm công giáo viên
@@ -112,9 +152,10 @@ const DetailSession = ({
                 <div className="row" key={teacher.teacher_id}>
                   <div className="col-sm-6">
                     <div className="form-group">
-                        <label
+                      <label
                         className="col-form-label"
                         htmlFor={`teacher-${teacher.teacher_id}`}
+                        id={`label-teacher-${teacher.teacher_id}`}
                       >
                         {teacher.full_name}
                       </label>
@@ -125,12 +166,12 @@ const DetailSession = ({
                       <select
                         id={`teacher-${teacher.teacher_id}`}
                         className="form-control"
-                        value={teacher.session_fee}
-                        onChange={handleFeeChange}
+                        value={teacher.session_salary}
+                        onChange={(e) => handleFeeChange(e, teacher.teacher_id)}
                       >
-                        {Object.keys(SessionFee).map((key) => (
-                          <option key={key} value={SessionFee[key].value}>
-                            {SessionFee[key].label}
+                        {Object.keys(SessionSalary).map((key) => (
+                          <option key={key} value={SessionSalary[key].value}>
+                            {SessionSalary[key].label}
                           </option>
                         ))}
                       </select>
@@ -150,12 +191,15 @@ const DetailSession = ({
                   <input
                     className="form-check-input"
                     type="checkbox"
-                    value={student.student_id}
+                    value={student.attend_flg}
+                    checked={!!student.attend_flg} // Sử dụng checked thay vì value
+                    onChange={(e) => handleAttendanceChange(e, student.student_id)}
                     id={`student-${student.student_id}`}
                   />
                   <label
                     className="form-check-label"
                     htmlFor={`student-${student.student_id}`}
+                    id={`label-student-${student.student_id}`}
                   >
                     {student.full_name}
                   </label>
@@ -166,7 +210,7 @@ const DetailSession = ({
         </div>
         <div className="modal-footer justify-content-between">
           <button type="submit" className="btn btn-primary">
-            Save changes
+            Lưu thay đổi
           </button>
         </div>
       </form>

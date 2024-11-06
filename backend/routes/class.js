@@ -9,6 +9,9 @@ const WorkingDay = require("../models/WorkingDay");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 const db = require("../config/db");
 const wd = require("../models/WorkingDay"); // Import Sequelize model
+const StudentAttend = require("../models/StudentAttend");
+const TeacherAttend = require("../models/TeacherAttend");
+const UserRole = require('../models/UserRole');
 
 // API lấy thông tin cấp độ theo ID
 router.get("/getWorkingDay/:id", async (req, res) => {
@@ -35,18 +38,21 @@ router.get("/workingDays", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/classTeacher/:id", checkAuth, async (req, res) => {
+router.get("/classTeacher", checkAuth, async (req, res) => {
   try {
-    console.log(req.params.id)
-    const paramClassId = req.params.id
+    const paramClassId = req.query.class_id
+    const paramScheduleId = req.query.schedule_id
     const classTeacher = await Class.sequelize.query(`
       SELECT 
             t.teacher_id,
-            t.full_name
+            t.full_name,
+            ta.session_salary
         FROM 
           class_teacher ct
         INNER JOIN 
           teacher t ON ct.teacher_id = t.teacher_id
+        LEFT JOIN
+          teacher_attend ta ON ct.teacher_id = ta.teacher_id AND ct.class_id = ta.class_id AND ta.schedule_id = :paramScheduleId
         WHERE
           ct.del_flg = 0
           AND t.del_flg = 0
@@ -54,7 +60,8 @@ router.get("/classTeacher/:id", checkAuth, async (req, res) => {
       `,
       {
         replacements: {
-          paramClassId
+          paramClassId,
+          paramScheduleId
         },
         type: Class.sequelize.QueryTypes.SELECT,
       }
@@ -65,18 +72,21 @@ router.get("/classTeacher/:id", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/classStudent/:id", checkAuth, async (req, res) => {
+router.get("/classStudent", checkAuth, async (req, res) => {
   try {
-    console.log(req.params.id)
-    const paramClassId = req.params.id
+    const paramClassId = req.query.class_id
+    const paramScheduleId = req.query.schedule_id
     const classStudent = await Class.sequelize.query(`
       SELECT 
             s.student_id,
-            s.full_name
+            s.full_name,
+            sa.attend_flg
         FROM 
           class_students cs
         INNER JOIN
           students s ON cs.student_id = s.student_id
+        LEFT JOIN
+          student_attend sa ON cs.student_id = sa.student_id AND cs.class_id = sa.class_id AND sa.schedule_id = :paramScheduleId
         WHERE
           cs.del_flg = 0
           AND s.del_flg = 0
@@ -84,7 +94,8 @@ router.get("/classStudent/:id", checkAuth, async (req, res) => {
       `,
       {
         replacements: {
-          paramClassId
+          paramClassId,
+          paramScheduleId
         },
         type: Class.sequelize.QueryTypes.SELECT,
       }
@@ -147,43 +158,18 @@ router.get("/classWeeklySchedule", checkAuth, async (req, res) => {
             wd.end_time,
             wd.is_temporary,
             c.class_name, 
-            l.level_code AS level,
-            teachers.teachers, 
-            c.Start_date,
-            c.End_date,
-            c.note, 
-            COUNT(cs.student_id) AS totalStudent,
-            GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.student_id SEPARATOR ', ') AS students
+            c.start_date,
+            c.end_date
         FROM 
             class c
         INNER JOIN 
             class_schedule wd ON c.class_id = wd.class_id
-        LEFT JOIN
-            class_students cs ON c.class_id = cs.class_id
-        LEFT JOIN 
-            students s ON cs.student_id = s.student_id
-        LEFT JOIN 
-            level l ON c.level_id = l.level_id
-        -- Truy vấn con để lấy danh sách giáo viên và sử dụng LEFT JOIN với bảng chính
-        LEFT JOIN (
-            SELECT 
-                ct.class_id,
-                GROUP_CONCAT(DISTINCT t.full_name ORDER BY t.teacher_id SEPARATOR ', ') AS teachers
-            FROM
-                class_teacher ct
-            LEFT JOIN
-                teacher t ON ct.teacher_id = t.teacher_id
-            WHERE
-                t.del_flg = 0
-            GROUP BY
-                ct.class_id
-        ) AS teachers ON c.class_id = teachers.class_id
         WHERE 
             c.del_flg = 0
             AND wd.del_flg = 0
             AND (:paramdepartmentId = 1 OR c.department_id = :paramdepartmentId)
         GROUP BY 
-            wd.working_day_id, wd.schedule_id, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name, l.level_code, teachers.teachers, c.note
+            wd.working_day_id, wd.schedule_id, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name
         ORDER BY 
             wd.working_day_id, wd.start_time, c.class_name;
       `,
@@ -206,28 +192,66 @@ router.get("/classWeeklySchedule", checkAuth, async (req, res) => {
 // Route để lấy danh sách các lớp học
 router.get("/getClasses", checkAuth, async (req, res) => {
   try {
+    const paramdepartmentId = 1
     const user = req.session.user;
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
+      paramdepartmentId = user.department_id;
+    }
 
-    // Lọc theo department_id nếu không phải là admin
-    const condition =
-      user.department_id !== 1 ? { department_id: user.department_id } : {};
-
-    const classes = await Class.findAll({
-      where: {
-        del_flg: 0,
-        ...condition, // Thêm điều kiện vào truy vấn
-      },
-      include: [
-        {
-          model: Department,
-          attributes: ["department_code"], // Chỉ lấy department_code
+    const classes = await Class.sequelize.query(
+      `
+        SELECT 
+            c.class_id,
+            c.class_name, 
+            c.start_date,
+            c.end_date,
+            c.note,
+            c.graduated_flg,
+            l.level_code,
+            d.department_code,
+            teachers.teachers, 
+            COUNT(cs.student_id) AS totalStudent
+        FROM 
+            class c
+        INNER JOIN 
+            level l ON c.level_id = l.level_id
+        INNER JOIN 
+            department d ON c.department_id = d.department_id
+        LEFT JOIN
+            class_students cs ON c.class_id = cs.class_id
+        LEFT JOIN 
+            students s ON cs.student_id = s.student_id
+        -- Truy vấn con để lấy danh sách giáo viên và sử dụng LEFT JOIN với bảng chính
+        LEFT JOIN (
+            SELECT 
+                ct.class_id,
+                GROUP_CONCAT(DISTINCT t.full_name ORDER BY t.teacher_id SEPARATOR ', ') AS teachers
+            FROM
+                class_teacher ct
+            LEFT JOIN
+                teacher t ON ct.teacher_id = t.teacher_id
+            WHERE
+                t.del_flg = 0
+            GROUP BY
+                ct.class_id
+        ) AS teachers ON c.class_id = teachers.class_id
+        WHERE 
+            c.del_flg = 0
+            AND l.del_flg = 0
+            AND d.del_flg = 0
+            AND (:paramdepartmentId = 1 OR c.department_id = :paramdepartmentId)
+        GROUP BY 
+            c.class_id, c.class_name, c.start_date, c.end_date, c.note, c.graduated_flg, l.level_code, d.department_code, teachers.teachers
+        ORDER BY 
+            c.class_id, c.start_date
+      `,
+      {
+        replacements: {
+          paramdepartmentId,
         },
-        {
-          model: Level,
-          attributes: ["level_code"], // Lấy level_code từ bảng Level
-        },
-      ],
-    });
+        type: Class.sequelize.QueryTypes.SELECT,
+      }
+    );
 
     res.json(classes);
   } catch (error) {
@@ -510,7 +534,7 @@ router.get("/getClassesByStudentId/:studentId", checkAuth, async (req, res) => {
       INNER JOIN
           department d ON c.department_id = d.department_id AND d.del_flg = 0
       LEFT JOIN 
-          student_attend sa ON sa.class_id = c.class_id AND sa.student_id = :paramStudentId
+          student_attend sa ON sa.class_id = c.class_id AND sa.student_id = :paramStudentId AND sa.attend_flg = 1
       WHERE
           cs.del_flg = 0
           AND cs.student_id = :paramStudentId
@@ -526,6 +550,43 @@ router.get("/getClassesByStudentId/:studentId", checkAuth, async (req, res) => {
     res.json(classes);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint để lưu/ cập nhật session cho học sinh và giáo viên
+router.put("/saveSession/:classId", async (req, res) => {
+  const classId = req.params.classId;
+  const { schedule_id, attend_date, teachers, students } = req.body;
+
+  try {
+    // Lưu thông tin điểm danh học sinh
+    for (const student of students) {
+      await StudentAttend.upsert({
+        class_id: classId,
+        student_id: student.student_id,
+        schedule_id: schedule_id,
+        attend_date: attend_date, // Ngày nhập
+        attend_flg: student.attend_flg, // Cờ điểm danh
+      });
+    }
+
+    // Lưu thông tin điểm danh giáo viên
+    for (const teacher of teachers) {
+      const session_salary = teacher.session_salary || 0; // Gán giá trị mặc định là 0 nếu session_salary là chuỗi rỗng
+
+      await TeacherAttend.upsert({
+        class_id: classId,
+        teacher_id: teacher.teacher_id,
+        schedule_id: schedule_id,
+        attend_date: attend_date, // Ngày phiên học
+        session_salary: session_salary, // Lương phiên học
+      });
+    }
+
+    return res.status(200).json({ message: "Session saved successfully" });
+  } catch (error) {
+    console.error("Error saving session:", error);
+    return res.status(500).json({ error: "Failed to save session" });
   }
 });
 

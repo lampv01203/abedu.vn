@@ -49,7 +49,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           {/* Top là một route được bảo vệ */}
           <Route path="/" element={<WithAuth><Top /></WithAuth>}>
-            <Route path="/"  element={<WithAuth><WorkSchedule /></WithAuth>} /> {/* Route mặc định cho Top */}
+            <Route path="/"  element={<WithAuth><WorkCalendar /></WithAuth>} /> {/* Route mặc định cho Top */}
             <Route path="workcalendar" element={<WithAuth><WorkCalendar /></WithAuth>} />
             <Route path="detailsession" element={<WithAuth><DetailSession /></WithAuth>} />
             {/* Student component */}

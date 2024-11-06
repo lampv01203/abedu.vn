@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import UserRole from "../../UserRole";
 import Toast from "../toast";
 import TeacherClassList from "./TeacherClassList";
+import { Link } from "react-router-dom";
 
 const EditTeacher = () => {
   const { user } = useOutletContext(); // Lấy user từ context
@@ -92,7 +93,7 @@ const EditTeacher = () => {
     } catch (error) {
       Toast.fire({
         icon: "error",
-        title: "Thay đổi thông tin giáo viên thất bại",
+        title: error.response.data.message,
       });
       console.error("Lỗi khi cập nhật thông tin giáo viên", error);
     }

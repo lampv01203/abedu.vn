@@ -8,6 +8,7 @@ import DetailSession from "./DetailSession";
 import { Modal } from "react-bootstrap";
 import { useOutletContext } from "react-router-dom";
 import UserRole from "../../UserRole";
+import Toast from "../toast";
 
 const WorkCalendar = () => {
   const { user } = useOutletContext();
@@ -30,16 +31,16 @@ const WorkCalendar = () => {
           class_id,
           schedule_id,
           class_name,
-          Start_date,
-          End_date,
+          start_date,
+          end_date,
           working_day_id,
           start_time,
           end_time,
         } = classSchedule;
         return {
           title: class_name,
-          startRecur: Start_date, // Ngày bắt đầu lặp lại
-          endRecur: End_date, // Ngày kết thúc lặp lại
+          startRecur: start_date, // Ngày bắt đầu lặp lại
+          endRecur: end_date, // Ngày kết thúc lặp lại
           daysOfWeek: [working_day_id],
           startTime: start_time,
           endTime: end_time,
@@ -47,8 +48,8 @@ const WorkCalendar = () => {
             title: class_name,
             class_id: class_id, // Đưa class_id vào extendedProps
             schedule_id: schedule_id,
-            startRecur: Start_date,
-            endRecur: End_date,
+            startRecur: start_date,
+            endRecur: end_date,
             daysOfWeek: [working_day_id],
             startTime: start_time,
             endTime: end_time,
@@ -106,6 +107,10 @@ const WorkCalendar = () => {
   const changeView = (view) => {
     const calendarApi = calendarRef.current.getApi();
     calendarApi.changeView(view);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetail(false);
   };
 
   if (loading) {
@@ -199,6 +204,7 @@ const WorkCalendar = () => {
                 dayOfWeek={selectedEvent.daysOfWeek}
                 startTime={selectedEvent.startTime}
                 endTime={selectedEvent.endTime}
+                onClose={handleCloseModal}
               />
             )}
           </Modal.Body>

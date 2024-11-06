@@ -53,8 +53,8 @@ router.get("/classes", checkAuth, async (req, res) => {
             c.del_flg = 0
             AND wd.del_flg = 0
             AND (:paramdepartmentId = 1 OR c.department_id = :paramdepartmentId)
-            AND c.Start_date < DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
-            AND c.End_date >= DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
+            AND c.start_date < DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
+            AND c.end_date >= DATE_SUB(:paramDate, INTERVAL WEEKDAY(:paramDate) DAY)
         GROUP BY 
             wd.day_of_week, wd.start_time, wd.end_time, wd.is_temporary, c.class_id, c.class_name, l.level_code, teachers.teachers, c.note
         ORDER BY 

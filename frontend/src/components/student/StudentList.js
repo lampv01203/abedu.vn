@@ -81,6 +81,8 @@ const StudentList = () => {
         <td className="w-center">{student.phone}</td>
         <td>{student.facebook}</td>
         <td className="w-center">{student.department_code}</td>
+        <td className="w-center">{student.department_code}</td>
+        <td className="w-center">{student.department_code}</td>
         <td>{student.note}</td>
       </tr>
     ));
@@ -152,15 +154,37 @@ const StudentList = () => {
                   placeholder="Lọc theo Facebook"
                 />
               </th>
-              <th className="w-110">
+              <th className="w-72">
                 Cơ sở
                 <input
-                  className="w-center w-110"
+                  className="w-center w-55"
                   type="text"
                   name="departmentCode"
                   value={filters.departmentCode}
                   onChange={handleFilterChange}
-                  placeholder="Lọc cơ sở"
+                  placeholder="Cơ sở"
+                />
+              </th>
+              <th className="w-center w-80">
+                Lớp dky
+                <input
+                  className="w-center w-80"
+                  type="text"
+                  name="departmentCode"
+                  value={filters.departmentCode}
+                  onChange={handleFilterChange}
+                  placeholder="Cơ sở"
+                />
+              </th>
+              <th className="w-center w-105">
+                Lớp đang học
+                <input
+                  className="w-center w-105"
+                  type="text"
+                  name="departmentCode"
+                  value={filters.departmentCode}
+                  onChange={handleFilterChange}
+                  placeholder="Cơ sở"
                 />
               </th>
               <th>

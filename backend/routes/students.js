@@ -4,6 +4,7 @@ const Student = require("../models/Student");
 const Department = require("../models/Department");
 const { Op } = require("sequelize");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
+const UserRole = require('../models/UserRole');
 
 // Route để lấy danh sách học sinh
 router.get("/students", checkAuth, async (req, res) => {
@@ -68,11 +69,11 @@ router.get("/students", checkAuth, async (req, res) => {
 // Route để lấy danh sách học sinh
 router.get("/getStudents", checkAuth, async (req, res) => {
   try {
+    const whereClause = {}
     const user = req.session.user;
-
-    // Tạo điều kiện tìm kiếm theo department_id nếu user.department_id không phải là 1
-    const whereClause =
-      user.department_id !== 1 ? { department_id: user.department_id } : {};
+    if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
+      whereClause = { department_id: user.department_id };
+    }
 
     const students = await Student.findAll({
       where: whereClause,
@@ -198,6 +199,7 @@ router.put("/updateStudent/:id", checkAuth, async (req, res) => {
     res.status(500).send("Lỗi server.");
   }
 });
+
 // Route để xóa học sinh
 router.delete("/deleteStudent/:id", checkAuth, async (req, res) => {
   try {
@@ -213,6 +215,42 @@ router.delete("/deleteStudent/:id", checkAuth, async (req, res) => {
   } catch (error) {
     console.error("Lỗi khi xóa học sinh", error);
     res.status(500).json({ message: "Lỗi server" });
+  }
+});
+
+// Trong routes hoặc controller của bạn
+router.get('/getStudentClassAttend/:studentId/:classId', async (req, res) => {
+  const { studentId, classId } = req.params;
+  try {
+    const attendData = await Student.sequelize.query(`
+      SELECT 
+          sa.id,
+          cs.day_of_week,
+          sa.attend_date,
+          cs.start_time,
+          cs.end_time,
+          sa.attend_flg
+        FROM 
+          student_attend sa
+        INNER JOIN 
+          class_schedule cs ON sa.schedule_id = cs.schedule_id
+        WHERE
+          cs.del_flg = 0
+          AND sa.class_id = :classId
+          AND sa.student_id = :studentId
+      `,
+      {
+        replacements: {
+          studentId,
+          classId
+        },
+        type: Student.sequelize.QueryTypes.SELECT,
+      }
+    );
+    res.json(attendData);
+  } catch (error) {
+    console.error("Error fetching attendance data:", error);
+    res.status(500).send("Error fetching attendance data");
   }
 });
 

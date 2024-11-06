@@ -49,8 +49,18 @@ const EditClass = () => {
           axios.get("/api/workingDays"),
           axios.get(`/api/classSchedule/${classId}`), // Fetch class_schedule data for editing
           axios.get("/api/teachers"),
-          axios.get(`/api/classTeacher/${classId}`), // Fetch class teacher data for editing
-          axios.get(`/api/classStudent/${classId}`), // Fetch class student data for editing
+          axios.get("/api/classTeacher", {
+              params: {
+                class_id: classId || "",
+                schedule_id: "-1",
+              },
+            }), // Fetch class teacher data for editing
+          axios.get("/api/classStudent", {
+              params: {
+                class_id: classId || "",
+                schedule_id: "-1",
+              },
+            }), // Fetch class student data for editing
         ]);
         setClassData({
           ...classRes.data,

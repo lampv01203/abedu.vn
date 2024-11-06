@@ -11,10 +11,12 @@ const ClassList = () => {
     class_name: "",
     level_code: "",
     department_code: "",
-    note: "",
+    teachers: "",
+    totalStudent: "",
     start_date: "",
     end_date: "",
     graduated_flg: "",
+    note: "",
   });
 
   // Lấy dữ liệu lớp học từ API
@@ -22,11 +24,7 @@ const ClassList = () => {
     axios
       .get("/api/getClasses")
       .then((response) => {
-        const classesData = response.data.map((classItem) => ({
-          ...classItem,
-          department_code: classItem.Department?.department_code,
-          level_code: classItem.Level?.level_code,
-        }));
+        const classesData = response.data;
         setClasses(classesData);
         setFilteredClasses(classesData);
       })
@@ -45,6 +43,9 @@ const ClassList = () => {
       const graduatedFiltered =
         classItem.graduated_flg === Number(filters.graduated_flg) ||
         filters.graduated_flg === "";
+      const isTotalStudentMatch =
+        filters.totalStudent === "" ||
+        classItem.totalStudent === Number(filters.totalStudent);
       return (
         (classItem.class_name || "")
           .toLowerCase()
@@ -55,12 +56,16 @@ const ClassList = () => {
         (classItem.department_code || "")
           .toLowerCase()
           .includes(filters.department_code.toLowerCase()) &&
+        (classItem.teachers || "")
+          .toLowerCase()
+          .includes(filters.teachers.toLowerCase()) &&
         (classItem.note || "")
           .toLowerCase()
           .includes(filters.note.toLowerCase()) &&
         (classItem.start_date || "").includes(filters.start_date) &&
         (classItem.end_date || "").includes(filters.end_date) &&
-        graduatedFiltered
+        graduatedFiltered &&
+        isTotalStudentMatch
       );
     });
     setFilteredClasses(filtered);
@@ -80,17 +85,26 @@ const ClassList = () => {
       <tr key={classItem.class_id}>
         <td className="w-stt">{index + 1}</td>
         <td>
-          <Link to={`/editClass/${classItem.class_id}`} className="text-primary">
+          <Link
+            to={`/editClass/${classItem.class_id}`}
+            className="text-primary"
+          >
             {classItem.class_name}
           </Link>
         </td>
         <td className="w-center">{classItem.level_code}</td>
         <td className="w-center">{classItem.department_code}</td>
+        <td>{classItem.teachers}</td>
+        <td className="w-center">{classItem.totalStudent}</td>
         <td className="w-center">
-          {classItem.start_date ? format(new Date(classItem.start_date), "dd/MM/yyyy") : ""}
+          {classItem.start_date
+            ? format(new Date(classItem.start_date), "dd/MM/yyyy")
+            : ""}
         </td>
         <td className="w-center">
-          {classItem.end_date ? format(new Date(classItem.end_date), "dd/MM/yyyy") : ""}
+          {classItem.end_date
+            ? format(new Date(classItem.end_date), "dd/MM/yyyy")
+            : ""}
         </td>
         <td>{classItem.graduated_flg ? "Đã kết khóa" : "Chưa kết khóa"}</td>
         <td>{classItem.note}</td>
@@ -131,26 +145,48 @@ const ClassList = () => {
                   placeholder="Lọc theo tên lớp"
                 />
               </th>
-              <th className="w-90">
+              <th className="w-60">
                 Cấp độ
                 <input
-                  className="w-90"
+                  className="w-60"
                   type="text"
                   name="level_code"
                   value={filters.level_code}
                   onChange={handleFilterChange}
-                  placeholder="Lọc cấp độ"
+                  placeholder="Cấp độ"
                 />
               </th>
-              <th className="w-80">
+              <th className="w-55">
                 Cơ sở
                 <input
-                  className="w-80 w-center"
+                  className="w-55 w-center"
                   type="text"
                   name="department_code"
                   value={filters.department_code}
                   onChange={handleFilterChange}
-                  placeholder="Lọc cơ sở"
+                  placeholder="Cơ sở"
+                />
+              </th>
+              <th className="w-180">
+                Giáo Viên
+                <input
+                  className="w-180"
+                  type="text"
+                  name="teachers"
+                  value={filters.teachers}
+                  onChange={handleFilterChange}
+                  placeholder="Lọc Giáo Viên"
+                />
+              </th>
+              <th className="w-45">
+                Sĩ Số
+                <input
+                  className="w-45 w-center"
+                  type="text"
+                  name="totalStudent"
+                  value={filters.totalStudent}
+                  onChange={handleFilterChange}
+                  placeholder="Sĩ Số"
                 />
               </th>
               <th className="w-110">
@@ -164,10 +200,10 @@ const ClassList = () => {
                   placeholder="Lọc theo ngày"
                 />
               </th>
-              <th className="w-130">
-                Ngày đóng khóa
+              <th className="w-110">
+                Ngày kết thúc
                 <input
-                  className="w-130 w-center"
+                  className="w-110 w-center"
                   type="text"
                   name="end_date"
                   value={filters.end_date}

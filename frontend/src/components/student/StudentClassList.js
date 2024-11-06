@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import Toast from "../toast";
+import StudentClassAttend from "./StudentClassAttend";
+import { Modal } from "react-bootstrap";
 
-const StudentClassList = ({studentId}) => {
+const StudentClassList = ({ studentId }) => {
   const [classes, setClasses] = useState([]); // Dữ liệu lớp học
   const [filteredClasses, setFilteredClasses] = useState([]); // Dữ liệu sau khi lọc
   const [filters, setFilters] = useState({
@@ -17,26 +19,31 @@ const StudentClassList = ({studentId}) => {
     total_sessions: "",
   });
 
+  const [showModal, setShowModal] = useState(false); // State để kiểm soát modal
+  const [selectedClassId, setSelectedClassId] = useState(null); // Lưu class_id khi click
+  const [selectedClassName, setSelectedClassName] = useState(null); // Lưu class_id khi click
+  const [selectedStudentId, setSelectedStudentId] = useState(studentId);
+
   // Lấy dữ liệu lớp học từ API
   useEffect(() => {
     const fetchClasses = async () => {
-    if (studentId) {
-      axios
-        .get(`/api/getClassesByStudentId/${studentId}`)
-        .then((response) => {
-          const classesData = response.data;
-          setClasses(response.data);
-          setFilteredClasses(classesData);
-        })
-        .catch((error) => {
-          Toast.fire({
-            icon: "error",
-            title: "Lỗi khi lấy thông tin",
+      if (studentId) {
+        axios
+          .get(`/api/getClassesByStudentId/${studentId}`)
+          .then((response) => {
+            const classesData = response.data;
+            setClasses(response.data);
+            setFilteredClasses(classesData);
+          })
+          .catch((error) => {
+            Toast.fire({
+              icon: "error",
+              title: "Lỗi khi lấy thông tin",
+            });
+            console.error("Error fetching classes:", error);
           });
-          console.error("Error fetching classes:", error);
-        });
-    } else {
-      setClasses([]);
+      } else {
+        setClasses([]);
       }
     };
     fetchClasses();
@@ -50,8 +57,8 @@ const StudentClassList = ({studentId}) => {
         filters.graduated_flg === "";
 
       const isTotalSessionsMatch =
-      filters.total_sessions === "" ||
-      level.total_sessions === Number(filters.total_sessions);
+        filters.total_sessions === "" ||
+        level.total_sessions === Number(filters.total_sessions);
       return (
         (classItem.class_name || "")
           .toLowerCase()
@@ -67,7 +74,8 @@ const StudentClassList = ({studentId}) => {
           .includes(filters.note.toLowerCase()) &&
         (classItem.start_date || "").includes(filters.start_date) &&
         (classItem.end_date || "").includes(filters.end_date) &&
-        graduatedFiltered && isTotalSessionsMatch
+        graduatedFiltered &&
+        isTotalSessionsMatch
       );
     });
     setFilteredClasses(filtered);
@@ -82,18 +90,33 @@ const StudentClassList = ({studentId}) => {
     }));
   };
 
+  const handleClassClick = (classId, className) => {
+    setSelectedClassId(classId); // Lưu class_id
+    setSelectedClassName(className);
+    setShowModal(true); // Mở modal
+  };
+
   const renderRows = () => {
     return filteredClasses.map((classItem, index) => (
-      <tr key={classItem.class_id}>
+      <tr
+        key={classItem.class_id}
+        onClick={() =>
+          handleClassClick(classItem.class_id, classItem.class_name)
+        }
+      >
         <td className="w-stt">{index + 1}</td>
         <td>{classItem.class_name}</td>
         <td className="w-center">{classItem.level_code}</td>
         <td className="w-center">{classItem.department_code}</td>
         <td className="w-center">
-          {classItem.start_date ? format(new Date(classItem.start_date), "dd/MM/yyyy") : ""}
+          {classItem.start_date
+            ? format(new Date(classItem.start_date), "dd/MM/yyyy")
+            : ""}
         </td>
         <td className="w-center">
-          {classItem.end_date ? format(new Date(classItem.end_date), "dd/MM/yyyy") : ""}
+          {classItem.end_date
+            ? format(new Date(classItem.end_date), "dd/MM/yyyy")
+            : ""}
         </td>
         <td>{classItem.graduated_flg ? "Đã kết khóa" : "Chưa kết khóa"}</td>
         <td className="w-center">{classItem.total_sessions} buổi</td>
@@ -108,7 +131,7 @@ const StudentClassList = ({studentId}) => {
         <h3 className="card-title">Danh sách lớp học</h3>
       </div>
       <div className="card-body table-responsive p-0 table-container">
-        <table className="table table-head-fixed table-bordered table-hover">
+        <table className="table table-head-fixed table-bordered table-hover attend-table">
           <thead>
             <tr>
               <th className="w-stt"></th>
@@ -215,6 +238,22 @@ const StudentClassList = ({studentId}) => {
           <tbody>{renderRows()}</tbody>
         </table>
       </div>
+
+      <Modal
+        dialogClassName="custom-modal-width"
+        show={showModal}
+        onHide={() => setShowModal(false)} >
+        <Modal.Header className="bg-primary text-white" closeButton>
+          <Modal.Title>Thông tin điểm danh lớp {selectedClassName}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedClassId && (
+            <StudentClassAttend
+              studentId={studentId}
+              classId={selectedClassId} />
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
