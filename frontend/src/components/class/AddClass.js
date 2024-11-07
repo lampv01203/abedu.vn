@@ -125,6 +125,17 @@ const AddClass = () => {
     }
   };
 
+  // Thêm hàm xử lý cho thông báo và class "is-invalid"
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity("Hãy điền thông tin này");
+    e.target.classList.add("is-invalid"); // Thêm class "is-invalid"
+  };
+
+  const handleInput = (e) => {
+    e.target.setCustomValidity("");
+    e.target.classList.remove("is-invalid"); // Xoá class "is-invalid" khi người dùng bắt đầu nhập
+  };
+
   return (
     <div className="card card-primary">
       <div className="card-header">
@@ -146,6 +157,8 @@ const AddClass = () => {
                 name="class_name"
                 value={classData.class_name}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               />
             </div>
@@ -163,6 +176,8 @@ const AddClass = () => {
                 name="level_id"
                 value={classData.level_id}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               >
                 <option value="">Chọn Cấp Độ</option>
@@ -187,6 +202,8 @@ const AddClass = () => {
                 name="department_id"
                 value={classData.department_id}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
                 disabled={
                   user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN ? false : true

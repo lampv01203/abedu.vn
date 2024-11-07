@@ -8,12 +8,13 @@ import "overlayscrollbars";
 import "apexcharts";
 import "admin-lte/dist/js/adminlte.js";
 import "admin-lte/dist/css/adminlte.css";
-import 'select2/dist/css/select2.min.css';
-import '../css/table.css';
-import '../css/table.scss';
-import '../css/form.css';
-import '../css/form.scss';
-import UserRole from '../UserRole';
+import "select2/dist/css/select2.min.css";
+import "../css/table.css";
+import "../css/table.scss";
+import "../css/form.css";
+import "../css/form.scss";
+import UserRole from "../UserRole";
+import { Link } from "react-router-dom";
 
 const TopScreen = () => {
   const navigate = useNavigate();
@@ -98,9 +99,13 @@ const TopScreen = () => {
                   <p>ABedu</p>
                 </li>
                 <li className="user-footer">
-                  <button className="btn btn-default btn-flat">
+                  <Link
+                    to="/profile"
+                    name="profile"
+                    className="btn btn-primary"
+                  >
                     Profile
-                  </button>
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="btn btn-default btn-flat float-end"
@@ -137,32 +142,69 @@ const TopScreen = () => {
               role="menu"
             >
               <li className="nav-item">
-                <NavLink to="/workcalendar" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+                <NavLink
+                  to="/workcalendar"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
                   <i className="nav-icon fas fa-calendar-alt"></i>
                   <p>Lịch làm việc</p>
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink to="/teacherlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+                <NavLink
+                  to="/teacherlist"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
                   <i className="nav-icon fa-solid fa-chalkboard-user"></i>
                   <p>Danh sách giáo viên</p>
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink to="/studentlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+                <NavLink
+                  to="/studentlist"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
                   <i className="nav-icon fa-solid fa-users"></i>
                   <p>Danh sách học sinh</p>
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink to="/classlist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+                <NavLink
+                  to="/classlist"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
                   <i className="nav-icon fa-solid fa-school"></i>
                   <p>Danh sách lớp học</p>
                 </NavLink>
               </li>
-              {(user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN) && (
+              <li className="nav-item">
+                <NavLink
+                  to="/teachersalary"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  <i className="nav-icon fa-solid fa-hand-holding-dollar"></i>
+                  <p>Thu chi</p>
+                </NavLink>
+              </li>
+              {(user?.role === UserRole.SYSTEM ||
+                user?.role === UserRole.ADMIN) && (
                 <li className="nav-item">
-                  <NavLink to="/levellist" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+                  <NavLink
+                    to="/levellist"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <i className="nav-icon fa-duotone fa-solid fa-layer-group"></i>
                     <p>Danh sách cấp độ</p>
                   </NavLink>
@@ -183,7 +225,8 @@ const TopScreen = () => {
         </div>
         <strong>
           Copyright © 2014-2021 <a href="https://abedu.vn">ABedu.vn</a>.
-        </strong> All rights reserved.
+        </strong>{" "}
+        All rights reserved.
       </footer>
     </div>
   );

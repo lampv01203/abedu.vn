@@ -99,6 +99,17 @@ const EditTeacher = () => {
     }
   };
 
+  // Thêm hàm xử lý cho thông báo và class "is-invalid"
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity("Hãy điền thông tin này");
+    e.target.classList.add("is-invalid"); // Thêm class "is-invalid"
+  };
+
+  const handleInput = (e) => {
+    e.target.setCustomValidity("");
+    e.target.classList.remove("is-invalid"); // Xoá class "is-invalid" khi người dùng bắt đầu nhập
+  };
+
   return (
     <div className="card card-primary">
       <form onSubmit={handleSubmit} className="form-horizontal">
@@ -133,6 +144,8 @@ const EditTeacher = () => {
                     value={teacher.full_name || ""}
                     onChange={handleChange}
                     placeholder="Nhập họ và tên"
+                    onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                    onInput={handleInput} // Thêm sự kiện onInput
                     required
                   />
                 </div>
@@ -155,6 +168,9 @@ const EditTeacher = () => {
                     } // Kiểm tra trước khi gán giá trị
                     onChange={handleChange}
                     placeholder="Nhập ngày sinh"
+                    onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                    onInput={handleInput} // Thêm sự kiện onInput
+                    required
                   />
                 </div>
               </div>
@@ -172,6 +188,9 @@ const EditTeacher = () => {
                     value={teacher.phone || ""}
                     onChange={handleChange}
                     placeholder="Nhập số điện thoại"
+                    onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                    onInput={handleInput} // Thêm sự kiện onInput
+                    required
                   />
                 </div>
               </div>

@@ -70,6 +70,17 @@ const AddStudent = () => {
     }
   };
 
+  // Thêm hàm xử lý cho thông báo và class "is-invalid"
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity("Hãy điền thông tin này");
+    e.target.classList.add("is-invalid"); // Thêm class "is-invalid"
+  };
+
+  const handleInput = (e) => {
+    e.target.setCustomValidity("");
+    e.target.classList.remove("is-invalid"); // Xoá class "is-invalid" khi người dùng bắt đầu nhập
+  };
+
   return (
     <div className="card card-primary">
       <div className="card-header">
@@ -90,6 +101,8 @@ const AddStudent = () => {
                 name="full_name"
                 value={formData.full_name}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               />
             </div>
@@ -106,6 +119,8 @@ const AddStudent = () => {
                 name="birthday"
                 value={formData.birthday}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               />
             </div>
@@ -122,6 +137,9 @@ const AddStudent = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
+                required
               />
             </div>
           </div>

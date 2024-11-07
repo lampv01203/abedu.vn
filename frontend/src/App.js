@@ -4,6 +4,7 @@ import { AuthProvider } from './auth/AuthContext.js'; // Dùng named import
 import WithAuth from "./auth/withAuth.js";
 import WithAdmin from "./auth/withAdmin.js";
 import Login from "./auth/Login.js"; // Giả sử đường dẫn đúng đến Login component
+import Profile from "./auth/Profile.js";
 import Top from "./components/Top"; // Giả sử đường dẫn đúng đến Top component
 import WorkSchedule from "./components/WorkSchedule";
 import StudentList from "./components/student/StudentList.js";
@@ -20,6 +21,7 @@ import AddClass from "./components/class/AddClass.js";
 import EditClass from "./components/class/EditClass.js";
 import WorkCalendar from "./components/work/WorkCalendar.js";
 import DetailSession from "./components/work/DetailSession.js";
+import TeacherSalary from "./components/income/TeacherSalary.js";
 import axios from "axios";
 
 // Thiết lập axios với baseURL và tùy chọn withCredentials
@@ -64,6 +66,12 @@ const App = () => {
             <Route path="classList" element={<WithAuth><ClassList /></WithAuth>} />
             <Route path="addclass" element={<WithAuth><AddClass /></WithAuth>} />
             <Route path="editclass/:classId" element={<WithAuth><EditClass /></WithAuth>} />
+
+            {/* income */}
+            <Route path="teachersalary" element={<WithAuth><TeacherSalary /></WithAuth>} />
+
+            {/* user */}
+            <Route path="profile" element={<WithAuth><Profile /></WithAuth>} />
 
             {/* Route được bảo vệ thêm với WithAdmin */}
             <Route path="levellist" element={<WithAdmin><LevelList /></WithAdmin>} />

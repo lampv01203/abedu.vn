@@ -79,7 +79,11 @@ const EditClass = () => {
         // setClassTeachers(classTeacherRes.data); // Set class_teacher data to form fields
         // setClassStudents(classStudentRes.data); // Set class_student data to form fields
       } catch (error) {
-        console.error("Error fetching data", error);
+        Toast.fire({
+          icon: "error",
+          title: "Lỗi khi lấy thông tin",
+        });
+        console.error("Error fetching classes:", error);
       }
     };
     fetchData();
@@ -159,6 +163,17 @@ const EditClass = () => {
     }
   };
 
+  // Thêm hàm xử lý cho thông báo và class "is-invalid"
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity("Hãy điền thông tin này");
+    e.target.classList.add("is-invalid"); // Thêm class "is-invalid"
+  };
+
+  const handleInput = (e) => {
+    e.target.setCustomValidity("");
+    e.target.classList.remove("is-invalid"); // Xoá class "is-invalid" khi người dùng bắt đầu nhập
+  };
+
   return (
     <div className="card card-primary">
       <div className="card-header">
@@ -180,6 +195,8 @@ const EditClass = () => {
                 name="class_name"
                 value={classData.class_name}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               />
             </div>
@@ -197,6 +214,8 @@ const EditClass = () => {
                 name="level_id"
                 value={classData.level_id}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
                 autoComplete="level-id" // Thêm thuộc tính này
               >
@@ -222,6 +241,8 @@ const EditClass = () => {
                 name="department_id"
                 value={classData.department_id}
                 onChange={handleChange}
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
                 autoComplete="department-id" // Thêm thuộc tính này
                 disabled={

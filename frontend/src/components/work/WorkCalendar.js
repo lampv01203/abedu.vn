@@ -105,13 +105,31 @@ const WorkCalendar = () => {
   };
 
   const changeView = (view) => {
-    const calendarApi = calendarRef.current.getApi();
-    calendarApi.changeView(view);
+    if (calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.changeView(view);
+    }
   };
 
   const handleCloseModal = () => {
     setShowDetail(false);
   };
+
+  const DepartmentSelect = () => (
+    <select
+      className="form-control"
+      value={selectedDepartment}
+      onChange={(e) => setSelectedDepartment(e.target.value)}
+      disabled={user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN}
+    >
+      <option value="">Chi nhánh</option>
+      {departments.map((department) => (
+        <option key={department.department_id} value={department.department_id}>
+          {department.department_code}
+        </option>
+      ))}
+    </select>
+  );
 
   if (loading) {
     return <div>Loading...</div>; // Hiển thị loading khi đang gọi API
@@ -134,11 +152,7 @@ const WorkCalendar = () => {
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
               required
-              disabled={
-                user?.role === UserRole.SYSTEM || user?.role === UserRole.ADMIN
-                  ? false
-                  : true
-              }
+              disabled={user?.role !== UserRole.SYSTEM && user?.role !== UserRole.ADMIN}
             >
               <option value="">Chọn chi nhánh</option>
               {departments.map((department) => (

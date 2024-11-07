@@ -8,6 +8,7 @@ const teachersRoutes = require('./routes/teachers');
 const departmentRoutes = require('./routes/departments');
 const levelRoutes = require('./routes/level');
 const classRoutes = require('./routes/class');
+const salaryRoutes = require("./routes/income");
 const session = require('express-session');
 
 
@@ -38,6 +39,7 @@ app.use('/api', teachersRoutes); // Kết nối route
 app.use('/api', departmentRoutes); // Kết nối route chi nhánh
 app.use('/api', levelRoutes); // Kết nối route level
 app.use('/api', classRoutes); // Kết nối route
+app.use('/api', salaryRoutes); // Kết nối route
 
 // npm run dev
 const PORT = process.env.PORT || 5000;

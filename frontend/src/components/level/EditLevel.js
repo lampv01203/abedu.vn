@@ -58,6 +58,17 @@ const EditLevel = () => {
     }
   };
 
+  // Thêm hàm xử lý cho thông báo và class "is-invalid"
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity("Hãy điền thông tin này");
+    e.target.classList.add("is-invalid"); // Thêm class "is-invalid"
+  };
+
+  const handleInput = (e) => {
+    e.target.setCustomValidity("");
+    e.target.classList.remove("is-invalid"); // Xoá class "is-invalid" khi người dùng bắt đầu nhập
+  };
+
   return (
     <div className="card card-primary">
       <div className="card-header">
@@ -81,6 +92,8 @@ const EditLevel = () => {
                 value={level.level_code}
                 onChange={handleChange}
                 placeholder="Nhập mã cấp độ"
+                onInvalid={handleInvalid} // Thêm sự kiện onInvalid
+                onInput={handleInput} // Thêm sự kiện onInput
                 required
               />
             </div>
@@ -101,7 +114,6 @@ const EditLevel = () => {
                 value={level.description || ""}
                 onChange={handleChange}
                 placeholder="Nhập nội dung"
-                required
               />
             </div>
           </div>
