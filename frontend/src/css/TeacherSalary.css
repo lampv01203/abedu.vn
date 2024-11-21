@@ -1,0 +1,33 @@
+/* TeacherSalary.css */
+
+.table-container-salary {
+  height: calc(100vh - 245px);
+  position: relative;
+  overflow-y: auto;
+}
+
+.fixed-header {
+  position: sticky;
+  top: 40px;
+  /* Adjust to position after the first header row */
+  background-color: white;
+  z-index: 2;
+}
+
+.table-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 2;
+}
+
+.table-footer table {
+  margin: 0;
+}
+
+.revenue,
+.revenue:hover,
+.revenue:focus {
+  color: white;
+}

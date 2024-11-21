@@ -11,6 +11,10 @@ body {
   align-items: center;
   height: 100vh;
 } */
+/* 
+.app-main {
+  height: calc(100vh - 182px);
+} */
 
 .main-footer {
   background-color: #fff;

@@ -523,6 +523,7 @@ router.get("/getClassesByStudentId/:studentId", checkAuth, async (req, res) => {
           c.graduated_flg,
           c.note,
           level.level_code,
+          level.session_number,
           d.department_code,
           COUNT(sa.id) AS total_sessions
       FROM 

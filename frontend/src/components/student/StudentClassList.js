@@ -17,6 +17,7 @@ const StudentClassList = ({ studentId }) => {
     end_date: "",
     graduated_flg: "",
     total_sessions: "",
+    session_number: "",
   });
 
   const [showModal, setShowModal] = useState(false); // State để kiểm soát modal
@@ -119,7 +120,7 @@ const StudentClassList = ({ studentId }) => {
             : ""}
         </td>
         <td>{classItem.graduated_flg ? "Đã kết khóa" : "Chưa kết khóa"}</td>
-        <td className="w-center">{classItem.total_sessions} buổi</td>
+        <td className="w-center">{classItem.total_sessions}/{classItem.session_number} buổi</td>
         <td>{classItem.note}</td>
       </tr>
     ));

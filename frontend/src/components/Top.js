@@ -187,13 +187,13 @@ const TopScreen = () => {
               </li>
               <li className="nav-item">
                 <NavLink
-                  to="/teachersalary"
+                  to="/revenue"
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"
                   }
                 >
                   <i className="nav-icon fa-solid fa-hand-holding-dollar"></i>
-                  <p>Thu chi</p>
+                  <p>Thu Chi</p>
                 </NavLink>
               </li>
               {(user?.role === UserRole.SYSTEM ||

@@ -21,7 +21,11 @@ import AddClass from "./components/class/AddClass.js";
 import EditClass from "./components/class/EditClass.js";
 import WorkCalendar from "./components/work/WorkCalendar.js";
 import DetailSession from "./components/work/DetailSession.js";
-import TeacherSalary from "./components/income/TeacherSalary.js";
+import Revenue from "./components/revenue/Revenue.js";
+import TeacherSalary from "./components/revenue/TeacherSalary.js";
+import Income from "./components/revenue/Income.js";
+import Expenditure from "./components/revenue/Expenditure.js";
+import Total from "./components/revenue/Total.js";
 import axios from "axios";
 
 // Thiết lập axios với baseURL và tùy chọn withCredentials
@@ -69,6 +73,10 @@ const App = () => {
 
             {/* income */}
             <Route path="teachersalary" element={<WithAuth><TeacherSalary /></WithAuth>} />
+            <Route path="revenue" element={<WithAuth><Revenue /></WithAuth>} />
+            <Route path="income" element={<WithAuth><Income /></WithAuth>} />
+            <Route path="expenditure" element={<WithAuth><Expenditure /></WithAuth>} />
+            <Route path="total" element={<WithAuth><Total /></WithAuth>} />
 
             {/* user */}
             <Route path="profile" element={<WithAuth><Profile /></WithAuth>} />

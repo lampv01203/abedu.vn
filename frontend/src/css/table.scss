@@ -6,7 +6,27 @@
   }
 }
 
-@include width-generator(5, 800, 5);
+@include width-generator(5, 800, 1);
+
+@mixin min-width-generator($start, $end, $step) {
+  @for $i from $start through $end {
+    .min-w-#{$i} {
+      min-width: #{$i}px;
+    }
+  }
+}
+
+@include min-width-generator(10, 500, 1);
+
+@mixin max-width-generator($start, $end, $step) {
+  @for $i from $start through $end {
+    .max-w-#{$i} {
+      max-width: #{$i}px;
+    }
+  }
+}
+
+@include max-width-generator(10, 500, 1);
 
 @mixin height-generator($start, $end, $step) {
   @for $i from $start through $end {
@@ -16,7 +36,7 @@
   }
 }
 
-@include height-generator(10, 500, 5);
+@include height-generator(10, 500, 1);
 
 @mixin min-height-generator($start, $end, $step) {
   @for $i from $start through $end {
@@ -26,7 +46,7 @@
   }
 }
 
-@include min-height-generator(10, 500, 5);
+@include min-height-generator(10, 500, 1);
 
 @mixin max-height-generator($start, $end, $step) {
   @for $i from $start through $end {
@@ -36,4 +56,4 @@
   }
 }
 
-@include max-height-generator(10, 500, 5);
+@include max-height-generator(10, 500, 1);
