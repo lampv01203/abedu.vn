@@ -61,7 +61,7 @@ const TopScreen = () => {
             </li>
           </ul>
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item dropdown">
+            {/* <li className="nav-item dropdown">
               <button className="nav-link" data-bs-toggle="dropdown">
                 <i className="bi bi-bell-fill"></i>
                 <span className="navbar-badge badge text-bg-warning">15</span>
@@ -76,7 +76,7 @@ const TopScreen = () => {
                   <span className="float-end text-secondary fs-7">3 mins</span>
                 </button>
               </div>
-            </li>
+            </li> */}
             <li className="nav-item dropdown user-menu">
               <button
                 className="nav-link dropdown-toggle"

@@ -5,6 +5,7 @@ const Department = require("../models/Department");
 const { Op } = require("sequelize");
 const checkAuth = require("./auth"); // Import hàm checkAuth từ auth.js
 const UserRole = require('../models/UserRole');
+const db = require("../config/db");
 
 // Route để lấy danh sách học sinh
 router.get("/students", checkAuth, async (req, res) => {
@@ -69,7 +70,7 @@ router.get("/students", checkAuth, async (req, res) => {
 // Route để lấy danh sách học sinh
 router.get("/getStudents", checkAuth, async (req, res) => {
   try {
-    const whereClause = {}
+    whereClause = {}
     const user = req.session.user;
     if (user.role !== UserRole.SYSTEM && user.role !== UserRole.ADMIN) {
       whereClause = { department_id: user.department_id };
@@ -251,6 +252,42 @@ router.get('/getStudentClassAttend/:studentId/:classId', async (req, res) => {
   } catch (error) {
     console.error("Error fetching attendance data:", error);
     res.status(500).send("Error fetching attendance data");
+  }
+});
+
+router.post("/registStudentClass", async (req, res) => {
+  const { studentId, classId } = req.body;
+  // Validate inputs
+  if (!studentId || !classId) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required parameters: studentId or classId",
+    });
+  }
+
+  try {
+    // Check if the record already exists
+    const existingEntry = await db.query(
+      "SELECT 1 FROM class_students WHERE student_id = ? AND class_id = ?",
+      [studentId, classId]
+    );
+
+    // Insert the new record
+    await db.query(
+      "INSERT INTO class_students (student_id, class_id) VALUES (?, ?)",
+      [studentId, classId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Class registration successful",
+    });
+  } catch (error) {
+    console.error("Error registering class:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while registering the class",
+    });
   }
 });
 

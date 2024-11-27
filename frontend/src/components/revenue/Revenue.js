@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import TeacherSalary from "./TeacherSalary";
-import Income from "./Income";
 
 const Revenue = () => {
   const [activeTab, setActiveTab] = useState("home"); // Track active tab

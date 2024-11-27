@@ -128,7 +128,7 @@ const TeacherClassList = ({ teacherId }) => {
         <h3 className="card-title">Danh sách lớp học</h3>
       </div>
       <div className="card-body table-responsive p-0 table-container">
-        <table className="table table-head-fixed table-bordered table-hover attend-table">
+        <table className="table table-head-fixed table-bordered table-hover t-pointer">
           <thead>
             <tr>
               <th className="w-stt"></th>

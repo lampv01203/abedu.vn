@@ -189,6 +189,7 @@ const EditStudent = () => {
                     placeholder="Nhập số điện thoại"
                     onInvalid={handleInvalid} // Thêm sự kiện onInvalid
                     onInput={handleInput} // Thêm sự kiện onInput
+                    autoComplete="off"
                     required
                   />
                 </div>

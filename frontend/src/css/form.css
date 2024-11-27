@@ -13,3 +13,8 @@
   width: 50%;
   max-width: 60%;
 }
+.custom-modal-width-90 {
+  width: 90%;
+  max-height: 80%;
+  max-width: 90%;
+}

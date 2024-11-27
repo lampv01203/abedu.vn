@@ -41,8 +41,8 @@
   text-align: center;
 }
 
-.w-1rem {
-  padding-left: 1rem !important;
+.pl-8 {
+  padding-left: 0.5rem !important;
 }
 
 .w-center {
@@ -77,6 +77,6 @@ a {
   border-right: 1px solid #dee2e6 !important;
 }
 
-.attend-table tbody tr:hover {
+.t-pointer tbody tr:hover {
   cursor: pointer; /* Thiết lập con trỏ khi rê chuột vào dòng */
 }

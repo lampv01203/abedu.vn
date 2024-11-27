@@ -33,7 +33,7 @@ const StudentList = () => {
           icon: "error",
           title: "Lỗi khi lấy thông tin",
         });
-        console.error('Lỗi khi lấy thông tin', error);
+        console.error("Lỗi khi lấy thông tin", error);
       });
   }, []);
 
@@ -71,7 +71,10 @@ const StudentList = () => {
       <tr key={student.student_id}>
         <td className="w-stt">{index + 1}</td>
         <td>
-          <Link to={`/editstudent/${student.student_id}`} className="text-primary">
+          <Link
+            to={`/editstudent/${student.student_id}`}
+            className="text-primary"
+          >
             {student.full_name}
           </Link>
         </td>
@@ -141,6 +144,7 @@ const StudentList = () => {
                   value={filters.phone}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo SĐT"
+                  autoComplete="off"
                 />
               </th>
               <th className="w-150">

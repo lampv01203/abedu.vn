@@ -144,6 +144,7 @@ const TeacherList = () => {
                   value={filters.phone}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo SĐT"
+                  autoComplete="off"
                 />
               </th>
               <th>
@@ -176,6 +177,7 @@ const TeacherList = () => {
                   value={filters.address}
                   onChange={handleFilterChange}
                   placeholder="Lọc theo address"
+                  autoComplete="off"
                 />
               </th>
               <th>

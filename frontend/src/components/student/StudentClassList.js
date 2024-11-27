@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import Toast from "../toast";
-import StudentClassAttend from "./StudentClassAttend";
 import { Modal } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import StudentClassAttend from "./StudentClassAttend";
+import StudentRegisClass from "./StudentRegisClass";
 
 const StudentClassList = ({ studentId }) => {
   const [classes, setClasses] = useState([]); // Dữ liệu lớp học
@@ -21,32 +23,33 @@ const StudentClassList = ({ studentId }) => {
   });
 
   const [showModal, setShowModal] = useState(false); // State để kiểm soát modal
+  const [showRegisClass, setShowRegisClass] = useState(false); // State để kiểm soát modal
   const [selectedClassId, setSelectedClassId] = useState(null); // Lưu class_id khi click
   const [selectedClassName, setSelectedClassName] = useState(null); // Lưu class_id khi click
   const [selectedStudentId, setSelectedStudentId] = useState(studentId);
 
   // Lấy dữ liệu lớp học từ API
-  useEffect(() => {
-    const fetchClasses = async () => {
-      if (studentId) {
-        axios
-          .get(`/api/getClassesByStudentId/${studentId}`)
-          .then((response) => {
-            const classesData = response.data;
-            setClasses(response.data);
-            setFilteredClasses(classesData);
-          })
-          .catch((error) => {
-            Toast.fire({
-              icon: "error",
-              title: "Lỗi khi lấy thông tin",
-            });
-            console.error("Error fetching classes:", error);
+  const fetchClasses = async () => {
+    if (studentId) {
+      axios
+        .get(`/api/getClassesByStudentId/${studentId}`)
+        .then((response) => {
+          const classesData = response.data;
+          setClasses(response.data);
+          setFilteredClasses(classesData);
+        })
+        .catch((error) => {
+          Toast.fire({
+            icon: "error",
+            title: "Lỗi khi lấy thông tin",
           });
-      } else {
-        setClasses([]);
-      }
-    };
+          console.error("Error fetching classes:", error);
+        });
+    } else {
+      setClasses([]);
+    }
+  };
+  useEffect(() => {
     fetchClasses();
   }, [studentId]);
 
@@ -97,6 +100,15 @@ const StudentClassList = ({ studentId }) => {
     setShowModal(true); // Mở modal
   };
 
+  const handleCloseModal = () => {
+    fetchClasses();
+    setShowRegisClass(false);
+  };
+
+  const handleRegisClassClick = () => {
+    setShowRegisClass(true);
+  };
+
   const renderRows = () => {
     return filteredClasses.map((classItem, index) => (
       <tr
@@ -120,7 +132,9 @@ const StudentClassList = ({ studentId }) => {
             : ""}
         </td>
         <td>{classItem.graduated_flg ? "Đã kết khóa" : "Chưa kết khóa"}</td>
-        <td className="w-center">{classItem.total_sessions}/{classItem.session_number} buổi</td>
+        <td className="w-center">
+          {classItem.total_sessions}/{classItem.session_number} buổi
+        </td>
         <td>{classItem.note}</td>
       </tr>
     ));
@@ -130,9 +144,19 @@ const StudentClassList = ({ studentId }) => {
     <div className="card max-h-378">
       <div className="card-header">
         <h3 className="card-title">Danh sách lớp học</h3>
+        <div className="card-tools">
+          <div className="input-group input-group-sm">
+            <Link
+              onClick={handleRegisClassClick}
+              className="btn btn-primary float-right"
+            >
+              <i className="far fa-plus-square"></i> Đăng ký lớp học
+            </Link>
+          </div>
+        </div>
       </div>
       <div className="card-body table-responsive p-0 table-container">
-        <table className="table table-head-fixed table-bordered table-hover attend-table">
+        <table className="table table-head-fixed table-bordered table-hover t-pointer">
           <thead>
             <tr>
               <th className="w-stt"></th>
@@ -241,9 +265,28 @@ const StudentClassList = ({ studentId }) => {
       </div>
 
       <Modal
+        dialogClassName="custom-modal-width-90"
+        show={showRegisClass}
+        onHide={() => setShowRegisClass(false)}
+      >
+        <Modal.Header className="bg-primary text-white" closeButton>
+          <Modal.Title>Đăng ký lớp học</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {studentId && (
+            <StudentRegisClass
+              studentId={studentId}
+              onClose={handleCloseModal}
+            />
+          )}
+        </Modal.Body>
+      </Modal>
+
+      <Modal
         dialogClassName="custom-modal-width"
         show={showModal}
-        onHide={() => setShowModal(false)} >
+        onHide={() => setShowModal(false)}
+      >
         <Modal.Header className="bg-primary text-white" closeButton>
           <Modal.Title>Thông tin điểm danh lớp {selectedClassName}</Modal.Title>
         </Modal.Header>
@@ -251,7 +294,8 @@ const StudentClassList = ({ studentId }) => {
           {selectedClassId && (
             <StudentClassAttend
               studentId={studentId}
-              classId={selectedClassId} />
+              classId={selectedClassId}
+            />
           )}
         </Modal.Body>
       </Modal>
