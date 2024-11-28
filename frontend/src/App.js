@@ -1,10 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from './auth/AuthContext.js'; // Dùng named import
-import WithAuth from "./auth/withAuth.js";
-import WithAdmin from "./auth/withAdmin.js";
-import Login from "./auth/Login.js"; // Giả sử đường dẫn đúng đến Login component
-import Profile from "./auth/Profile.js";
+import { AuthProvider } from './user/AuthContext.js'; // Dùng named import
+import WithAuth from "./user/withAuth.js";
+import WithAdmin from "./user/withAdmin.js";
+import Login from "./user/Login.js"; // Giả sử đường dẫn đúng đến Login component
+import Profile from "./user/Profile.js";
+import AddUser from "./user/AddUser.js";
 import Top from "./components/Top"; // Giả sử đường dẫn đúng đến Top component
 import WorkSchedule from "./components/WorkSchedule";
 import StudentList from "./components/student/StudentList.js";
@@ -80,6 +81,7 @@ const App = () => {
 
             {/* user */}
             <Route path="profile" element={<WithAuth><Profile /></WithAuth>} />
+            <Route path="adduser" element={<WithAuth><AddUser /></WithAuth>} />
 
             {/* Route được bảo vệ thêm với WithAdmin */}
             <Route path="levellist" element={<WithAdmin><LevelList /></WithAdmin>} />

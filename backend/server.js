@@ -1,7 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const loginRoutes = require('./routes/login');
+const userRoutes = require('./routes/user');
 const workScheduleRoutes = require('./routes/workSchedule');
 const studentsRoutes = require('./routes/students');
 const teachersRoutes = require('./routes/teachers');
@@ -32,7 +32,7 @@ app.use(session({
 }));
 
 // Sử dụng route đăng nhập
-app.use('/api', loginRoutes);
+app.use('/api', userRoutes);
 app.use('/api', workScheduleRoutes); // Kết nối route
 app.use('/api', studentsRoutes); // Kết nối route
 app.use('/api', teachersRoutes); // Kết nối route

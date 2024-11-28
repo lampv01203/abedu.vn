@@ -210,6 +210,20 @@ const TopScreen = () => {
                   </NavLink>
                 </li>
               )}
+              {(user?.role === UserRole.SYSTEM ||
+                user?.role === UserRole.ADMIN) && (
+                <li className="nav-item">
+                  <NavLink
+                    to="/adduser"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
+                    <i className="nav-icon fa-solid fa-user-plus"></i>
+                    <p>Thêm tài khoản</p>
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
