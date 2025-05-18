@@ -29,6 +29,7 @@ import Expenditure from "./components/revenue/Expenditure.js";
 import Total from "./components/revenue/Total.js";
 import axios from "axios";
 
+// update 18/5/2025
 // Thiết lập axios với baseURL và tùy chọn withCredentials
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 axios.defaults.withCredentials = true; 
